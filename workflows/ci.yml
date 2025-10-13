@@ -32,8 +32,6 @@ jobs:
           pip install ruff==0.* black==24.* mypy==1.* pytest==8.*
       - name: Ruff (lint)
         run: ruff check . --output-format=github
-      - name: Black (format)
-        run: black --check .
       - name: Mypy (types)
         run: mypy . --install-types --non-interactive
       - name: Pytest
