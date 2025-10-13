@@ -1,0 +1,64 @@
+name: Feature request
+description: Propose a new feature or enhancement
+title: "feat: <concise summary>"
+labels: ["type:feature", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Fill out the sections so Copilot coding agent and reviewers have all the context.
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why is this needed? Link user stories, metrics, or issues.
+      placeholder: e.g. We need rolling stats for daily arrivals to support bed forecasting.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Outline of the approach. List key modules/functions to touch.
+      placeholder: e.g. Add `rolling_stats.py` with 7d mean/CI; flag regime changes.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints / non-functional requirements
+      description: Performance, data, privacy, compatibility, UX, style, or regulatory constraints.
+      placeholder: |
+        - Must process 30k rows in < 10s on GHA ubuntu-latest
+        - Follow existing CLI UX and logging format
+        - No breaking changes to public API
+    validations:
+      required: false
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: Explicitly state what's out of scope to keep the agent focused.
+      placeholder: e.g. Not implementing realtime dashboard in this issue.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Bullet list of verifiable outcomes and constraints.
+      placeholder: |
+        - [ ] CLI command `chum stats --window 7` outputs JSON with mean & stdev
+        - [ ] Unit tests cover edge cases (missing days)
+        - [ ] Max runtime < 10s on 30k rows
+        - [ ] Docs updated
+    validations:
+      required: true
+  - type: textarea
+    id: testplan
+    attributes:
+      label: Test plan
+      description: How will we validate (unit/integration, sample data, golden files)?
+      placeholder: e.g. Pytest over `tests/test_rolling_stats.py`, seed input in `tests/data/`.
+    validations:
+      required: true

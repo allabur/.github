@@ -1,0 +1,156 @@
+{
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "scminput": false
+  },
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "chat.instructionsFilesLocations": [
+    "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions"
+  ],
+  "chat.promptFilesLocations": [
+    "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\prompts"
+  ],
+  "chat.promptFiles": true,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\general-coding.instructions.md"
+    },
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\python-coding.instructions.md"
+    },
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\javascript-typescript.instructions.md"
+    },
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\database.instructions.md"
+    },
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\devops.instructions.md"
+    },
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\frontend.instructions.md"
+    }
+  ],
+  "github.copilot.chat.testGeneration.instructions": [
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\test-generation.instructions.md"
+    },
+    {
+      "text": "Always include edge cases and error scenarios in tests"
+    },
+    {
+      "text": "Use descriptive test names that explain the scenario being tested"
+    },
+    {
+      "text": "Follow NumPy docstring format for test documentation"
+    }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\code-review.instructions.md"
+    },
+    {
+      "text": "Focus on security vulnerabilities, performance issues, and maintainability"
+    },
+    {
+      "text": "Provide specific, actionable feedback with code examples when possible"
+    },
+    {
+      "text": "Check for adherence to naming conventions and project standards"
+    }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\commit-messages.instructions.md"
+    },
+    {
+      "text": "Use conventional commit format with appropriate type prefixes"
+    },
+    {
+      "text": "Keep the first line under 50 characters and use imperative mood"
+    },
+    {
+      "text": "Write all commit messages in English"
+    }
+  ],
+  "github.copilot.chat.pullRequestDescriptionGeneration.instructions": [
+    {
+      "file": "c:\\Users\\alber\\OneDrive - UPV\\3_resources\\software\\vscode\\instructions\\pull-request.instructions.md"
+    },
+    {
+      "text": "Include comprehensive description with type of change, testing done, and deployment notes"
+    },
+    {
+      "text": "Reference related issues and include appropriate checklists"
+    },
+    {
+      "text": "Follow project naming conventions and standards"
+    }
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 80,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  "files.associations": {
+    "*.instructions.md": "markdown",
+    "*.prompt.md": "markdown"
+  },
+  "git.enableCommitSigning": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.fontSize": 14,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.git": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.vscode": false
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.ts": "${capture}.js, ${capture}.d.ts.map, ${capture}.d.ts, ${capture}.js.map",
+    "*.tsx": "${capture}.ts",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml",
+    "*.instructions.md": "${capture}.*.md",
+    "*.prompt.md": "${capture}.*.md"
+  },
+  "extensions.autoUpdate": "onlyEnabledExtensions",
+  "github.copilot.chat.followUps": "always",
+  "github.copilot.chat.localeOverride": "auto"
+}
