@@ -1,39 +1,233 @@
-# Repository instructions for GitHub Copilot
+# Repository Instructions for GitHub Copilot
 
-## Summary
+## Table of Contents
 
-- **Tech & tooling**: Python 3.13+, pytest, ruff, mypy. CI defined in `.github/workflows/ci.yml`.
-- **How to run locally**: `pip install -r requirements-dev.txt && pytest -q && ruff check . && mypy .`.
-- **Coding style**: PEP 8; format and lint with Ruff; typing mandatory in new/modified code.
-- **Commits**: Use Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`). Include `!` for breaking changes.
-- **Issues**: Generate issues using the templates under `.github/ISSUE_TEMPLATE`. Fill Context, Proposed solution, Acceptance criteria, Test plan.
-- **PRs**: Open small PRs (≤ 300 lines of diff) with tests and docs updates. Ensure CI is green.
-- **Task delegation**: When assigned an Issue, plan work, open a PR, run tests, and iterate on reviewer feedback until checks pass.
+- [Tech Stack](#tech-stack)
+- [Development Workflow](#development-workflow)
+- [Project Structure](#project-structure)
+- [Dependencies & Environment](#dependencies--environment)
+- [Detailed Guidelines](#detailed-guidelines)
 
-## Overview
+---
 
-- **Language:** All code, comments, and documentation are written in **English** for consistency and clarity.
-- **Project Structure:** Use a clear, standard layout with separate directories for different components of the project:
-  - `docs/` – Project documentation (user guides, API reference, tutorials, etc.).
-  - `data/` – Data files or sample datasets (if needed for examples or tests).
-  - `notebooks/` – Jupyter notebooks for exploration or tutorials (kept out of production code).
-  - `src/` – Python source code in a **package** (use a [“src” layout](https://packaging.python.org/en/latest/tutorials/packaging-projects/#structuring-your-project) to avoid import issues). For example, `src/<your_package>/__init__.py` plus modules.
-  - `tests/` – Test suite, mirroring the structure of the `src/` package (e.g., `tests/<module>/test_module.py`).
-  - Top-level files: `pyproject.toml` (build system and project metadata), `environment.yml` (mamba environment spec for reproducibility), `README.md`, `LICENSE`, `CHANGELOG.md`, and configuration for CI (`.github/workflows/` if using GitHub Actions).
-- **Dependencies & Environment:** Manage packages and Python version at two levels:
-  - _Package requirements_: declare runtime dependencies and Python version (>= 3.12) in `pyproject.toml` (PEP 621). Use widely adopted libraries (e.g., **pandas**, **NumPy**, **scikit-learn**, **matplotlib**, **seaborn**, **networkx**, **pm4py**, **openpyxl**) and avoid unnecessary or unmaintained packages. Pin minimum versions if needed for compatibility, but allow flexibility for patch updates.
-  - _Development environment_: use **mamba** (**Mamba**) for isolation. Provide a `environment.yml` file to recreate the exact mamba environment for the project. Include Python 3.12 and all core libraries. This ensures collaborators (human or AI) can easily set up a matching environment with `mamba env create -f environment.yml`.
-  - Keep development and build tools in a separate dev section (e.g., in `pyproject.toml` or as `environment.yml` dev dependencies), including linters/formatters (**Ruff**), type-checker (**Mypy**), and testing tools.
-  - _Imports_: Organize imports into groups: standard library, third-party, then local package imports. Use one import per line and absolute imports for clarity (PEP 8 recommends explicit absolute imports). Automate import sorting with **ruff** to enforce this structure.
+## Tech Stack
 
-## [Coding](instructions/my-code.instructions.md)
+| Tool   | Purpose                | Version |
+| ------ | ---------------------- | ------- |
+| Python | Language               | 3.13+   |
+| pytest | Testing                | Latest  |
+| ruff   | Linting & Formatting   | Latest  |
+| mypy   | Type Checking          | Latest  |
+| mamba  | Environment Management | Latest  |
 
-## [Testing](instructions/my-tests.instructions.md)
+### CI/CD
 
-## [Documentation](instructions/my-docs.instructions.md)
+Continuous integration is defined in `.github/workflows/ci.yml` and runs on every push and pull request.
 
-## [CI/CD](instructions/my-ci-cd.instructions.md)
+---
 
-## [Reviewing](instructions/my-review.instructions.md)
+## Development Workflow
 
-Each of the above points contributes to a project that is maintainable, reliable, and easy to use. By enforcing these guidelines, you ensure that both human contributors and AI assistants (like GitHub Copilot) produce code that is consistent with the project’s standards, resulting in a smoother collaboration and a healthier codebase overall.
+### 🚀 Quick Start
+
+Set up your development environment with `mamba` and verify your setup:
+
+```bash
+# Create and activate the mamba environment
+mamba env create -f environment.yml
+mamba activate <project-name>
+
+# Install the package in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Verify setup by running checks
+pytest -q
+ruff check .
+mypy .
+```
+
+**Alternative for existing environments:**
+
+```bash
+# Activate existing environment
+mamba activate <project-name>
+
+# Update dependencies if needed
+mamba env update -f environment.yml --prune
+
+# Run verification
+pytest -q && ruff check . && mypy .
+```
+
+### 📝 Commit Guidelines
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+- `feat:` - New feature (minor version bump)
+- `fix:` - Bug fix (patch version bump)
+- `refactor:` - Code refactoring (no version bump)
+- `docs:` - Documentation changes (no version bump)
+- `test:` - Test additions/changes (no version bump)
+- `ci:` - CI/CD changes (no version bump)
+- `chore:` - Maintenance tasks (no version bump)
+
+Add `!` for breaking changes: `feat!:` or `fix!:` (major version bump)
+
+**Examples:**
+
+```
+feat(api): add user authentication endpoint
+fix(parser): handle null values in JSON response
+docs: update installation instructions
+```
+
+### 🐛 Issues
+
+Generate issues using templates in `.github/ISSUE_TEMPLATE/`. Required sections:
+
+1. **Context** - Background and problem description
+2. **Proposed Solution** - Recommended approach
+3. **Acceptance Criteria** - Definition of done
+4. **Test Plan** - How to verify the fix
+
+### 🔀 Pull Requests
+
+**Requirements:**
+
+- Keep PRs small (≤ 300 lines of diff)
+- Include tests for new features and bug fixes
+- Update documentation as needed
+- Ensure all CI checks pass (green status)
+
+### 🤖 Task Delegation
+
+When assigned an issue:
+
+1. Plan the work and break it into steps
+2. Open a draft PR early
+3. Run tests locally before pushing
+4. Iterate on reviewer feedback
+5. Ensure all checks pass before requesting final review
+
+---
+
+## Project Structure
+
+### Standard Layout
+
+```
+project/
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml
+│   └── ISSUE_TEMPLATE/
+├── docs/              # User guides, API reference, tutorials
+├── data/              # Sample datasets (optional)
+├── notebooks/         # Jupyter notebooks (not in production)
+├── src/
+│   └── <package>/     # Python source code
+│       ├── __init__.py
+│       └── ...
+├── tests/             # Test suite (mirrors src/ structure)
+│   └── test_*.py
+├── pyproject.toml     # Build system & project metadata
+├── environment.yml    # Mamba environment specification
+├── README.md
+├── LICENSE
+└── CHANGELOG.md
+```
+
+### Directory Guidelines
+
+| Directory        | Purpose               | Notes                                                                                                             |
+| ---------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `docs/`          | Project documentation | User guides, API reference, tutorials                                                                             |
+| `data/`          | Sample datasets       | For examples or tests only                                                                                        |
+| `notebooks/`     | Jupyter notebooks     | Exploration only, not production                                                                                  |
+| `src/<package>/` | Python source code    | Use ["src" layout](https://packaging.python.org/en/latest/tutorials/packaging-projects/#structuring-your-project) |
+| `tests/`         | Test suite            | Mirror `src/` structure                                                                                           |
+
+**Language:** All code, comments, and documentation are written in **English** for consistency and clarity.
+
+---
+
+## Dependencies & Environment
+
+### Two-Level Management
+
+#### 1️⃣ Package Requirements (`pyproject.toml`)
+
+Declare runtime dependencies and Python version (≥ 3.12) using PEP 621 standard:
+
+```toml
+[project]
+name = "mypackage"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+```
+
+**Preferred Libraries:**
+
+- Data: pandas, NumPy, openpyxl
+- ML: scikit-learn
+- Visualization: matplotlib, seaborn
+- Process Mining: pm4py
+- Graphs: networkx
+
+**Guidelines:**
+
+- Use widely adopted, well-maintained libraries
+- Pin minimum versions for compatibility
+- Allow flexibility for patch updates
+
+#### 2️⃣ Development Environment (`environment.yml`)
+
+Use **mamba** for isolated, reproducible environments:
+
+```yaml
+name: myproject
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pandas>=2.0
+  - numpy>=1.24
+  - pytest>=7.0
+  - ruff>=0.1
+  - mypy>=1.0
+```
+
+**Setup:**
+
+```bash
+mamba env create -f environment.yml
+mamba activate myproject
+```
+
+---
+
+## Detailed Guidelines
+
+### [Coding](instructions/my-code.instructions.md)
+
+### [Testing](instructions/my-tests.instructions.md)
+
+### [Documentation](instructions/my-docs.instructions.md)
+
+### [CI/CD](instructions/my-ci-cd.instructions.md)
+
+### [Reviewing](instructions/my-review.instructions.md)
+
+Each of the above points contributes to a project that is maintainable, reliable, and easy to use. By enforcing these guidelines, you ensure that both human contributors and AI assistants (like GitHub Copilot) produce code that is consistent with the project's standards, resulting in a smoother collaboration and a healthier codebase overall.
