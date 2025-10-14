@@ -290,6 +290,47 @@ Detailed conventional commits specification including Jupyter notebook conventio
 
 ---
 
+## Available Prompts
+
+Use prompts with `/` command in Copilot Chat (e.g., `/analyze-dataframe`):
+
+### [Analyze DataFrame](prompts/analyze-dataframe.prompt.md)
+
+**Usage**: `/analyze-dataframe`  
+Comprehensive statistical insights, data quality assessment, missing values, outliers, and cleaning recommendations.
+
+### [Document Function](prompts/document-function.prompt.md)
+
+**Usage**: `/document-function`  
+Generate NumPy-style docstrings with type hints, parameters, returns, raises, and examples.
+
+### [Generate Pytest](prompts/generate-pytest.prompt.md)
+
+**Usage**: `/generate-pytest`  
+Create comprehensive pytest tests with AAA pattern, fixtures, parametrization, and edge case coverage.
+
+### [Create LaTeX Table](prompts/create-latex-table.prompt.md)
+
+**Usage**: `/create-latex-table`  
+Convert data into professional LaTeX tables with booktabs formatting, ideal for academic publications.
+
+### [Optimize Code](prompts/optimize-code.prompt.md)
+
+**Usage**: `/optimize-code`  
+Identify performance bottlenecks and suggest optimizations with profiling guidance and speedup estimates.
+
+### [Review Commit](prompts/review-commit.prompt.md)
+
+**Usage**: `/review-commit`  
+Review staged changes and generate conventional commit messages with detailed body and issue references.
+
+### [AI Safety Review](prompts/ai-prompt-engineering-safety-review.prompt.md)
+
+**Usage**: `/ai-safety-review`  
+Comprehensive AI prompt engineering safety review analyzing bias, security, and effectiveness.
+
+---
+
 ## Extending These Instructions
 
 **For Individual Projects**: Create `.github/copilot-instructions.md` in your project to:
