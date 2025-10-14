@@ -1,5 +1,21 @@
 # Repository Instructions for GitHub Copilot
 
+## About This Repository
+
+This is a **default `.github` repository** for the `allabur` GitHub account. All health files, workflows, and AI agent instructions defined here automatically apply to any repository under this account that doesn't have its own versions.
+
+**Key Components:**
+
+- **Health Files**: CODEOWNERS, PR templates, issue templates that apply org-wide
+- **Reusable Workflows**: Shared CI/CD workflows in `workflows/`
+- **AI Agent Instructions**: Modular guidelines in `instructions/` for coding, testing, commits, CI/CD, reviews, and docs
+- **Chat Modes & Prompts**: AI agent personas (`chatmodes/`) and reusable prompts (`prompts/`)
+- **Reference Projects**: `refs/` contains external projects for studying patterns (awesome-copilot, feedbackflow)
+
+**How to Extend**: Create project-specific `.github/copilot-instructions.md` in individual repos to override or augment these defaults. Reference detailed guidelines via: `[Coding](instructions/my-code.instructions.md)`
+
+---
+
 ## Table of Contents
 
 - [Tech Stack](#tech-stack)
@@ -12,6 +28,8 @@
 
 ## Tech Stack
 
+**Default Stack (Python Projects):**
+
 | Tool   | Purpose                | Version |
 | ------ | ---------------------- | ------- |
 | Python | Language               | 3.13+   |
@@ -19,6 +37,8 @@
 | ruff   | Linting & Formatting   | Latest  |
 | mypy   | Type Checking          | Latest  |
 | mamba  | Environment Management | Latest  |
+
+**Other Languages**: For C#/.NET projects, see `refs/feedbackflow/AGENTS.MD` for dotnet-specific commands and patterns.
 
 ### CI/CD
 
@@ -73,12 +93,15 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) format:
 
 Add `!` for breaking changes: `feat!:` or `fix!:` (major version bump)
 
+**Special Case - Jupyter Notebooks**: Use `notebook({filename}): WIP updates {YYYY-MM-DD}` format, ignoring outputs/metadata.
+
 **Examples:**
 
 ```
 feat(api): add user authentication endpoint
 fix(parser): handle null values in JSON response
 docs: update installation instructions
+notebook(analysis): WIP updates 2025-10-14
 ```
 
 ### 🐛 Issues
@@ -109,11 +132,30 @@ When assigned an issue:
 4. Iterate on reviewer feedback
 5. Ensure all checks pass before requesting final review
 
+**AI Agent Control**: See `instructions/taming-copilot.instructions.md` for directives on controlling AI behavior (primacy of user commands, factual verification, surgical code edits).
+
 ---
 
 ## Project Structure
 
-### Standard Layout
+### This Repository Layout
+
+```
+.github/
+├── workflows/          # Reusable CI/CD workflows (ci.yml, release.yml, pre-release.yml)
+├── instructions/       # Modular AI agent instructions (*.instructions.md)
+├── chatmodes/          # AI personas for specialized assistance (*.chatmode.md)
+├── prompts/            # Reusable task-specific prompts (*.prompt.md)
+├── refs/               # Reference projects for studying patterns
+│   ├── awesome-copilot/    # GitHub Copilot customizations collection
+│   └── feedbackflow/       # C#/.NET reference project
+├── ISSUE_TEMPLATE/     # Org-wide issue templates
+├── copilot-instructions.md # This file (overview for AI agents)
+├── PULL_REQUEST_TEMPLATE.md
+└── CODEOWNERS
+```
+
+### Standard Python Project Layout
 
 ```
 project/
@@ -222,12 +264,50 @@ mamba activate myproject
 
 ### [Coding](instructions/my-code.instructions.md)
 
+Core principles, naming conventions (PEP 8), type hints (Python 3.10+), error handling patterns.
+
 ### [Testing](instructions/my-tests.instructions.md)
+
+Pytest framework, AAA pattern, coverage goals (60%→75%→90%), test organization strategies.
 
 ### [Documentation](instructions/my-docs.instructions.md)
 
+Documentation standards and best practices for code, APIs, and user guides.
+
 ### [CI/CD](instructions/my-ci-cd.instructions.md)
 
+Required CI steps (ruff, mypy, pytest), semantic versioning with python-semantic-release, Git Flow branching.
+
 ### [Reviewing](instructions/my-review.instructions.md)
+
+Code review guidelines and best practices for pull requests.
+
+### [Commit Messages](instructions/my-commit-messages.instructions.md)
+
+Detailed conventional commits specification including Jupyter notebook conventions.
+
+### [Taming Copilot](instructions/taming-copilot.instructions.md)
+
+**META-INSTRUCTIONS**: Controls AI agent behavior - primacy of user directives, factual verification over assumptions, surgical code modifications, intelligent tool usage.
+
+---
+
+## Extending These Instructions
+
+**For Individual Projects**: Create `.github/copilot-instructions.md` in your project to:
+
+- Override these defaults entirely, OR
+- Reference and extend: `See [default instructions](https://github.com/allabur/.github) for baseline, with these project-specific additions:`
+
+**Adding New Instructions**: Create `*.instructions.md` files in `instructions/` with frontmatter:
+
+```yaml
+---
+description: "Brief description"
+applyTo: "**/*" # or specific glob pattern
+---
+```
+
+**Using Chat Modes**: Reference chat modes like `chatmodes/4.1-Beast.chatmode.md` for autonomous agent behavior with extensive verification and iteration.
 
 Each of the above points contributes to a project that is maintainable, reliable, and easy to use. By enforcing these guidelines, you ensure that both human contributors and AI assistants (like GitHub Copilot) produce code that is consistent with the project's standards, resulting in a smoother collaboration and a healthier codebase overall.
