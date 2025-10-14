@@ -20,13 +20,15 @@ When conducting code reviews:
 ### Code Quality
 
 - Check for code readability and maintainability
-- Verify adherence to established coding standards
+- Verify adherence to established coding standards (PEP 8 via ruff)
 - Look for potential bugs and logic errors
 - Assess code complexity and suggest simplifications
 - Review error handling and edge case coverage
-- Verify complete type annotations for all function parameters and return values
-- Check that type hints follow modern Python standards (Union vs |, Optional vs Union[T, None])
+- **TDD Compliance**: Verify tests were written before implementation code
+- **Type annotations**: Verify complete type annotations for all function parameters and return values
+- Check that type hints follow modern Python 3.10+ standards (`|` not `Union`, built-in types not `typing` imports)
 - Ensure type annotations match actual implementation and usage
+- **Mypy compliance**: Verify code passes mypy strict mode
 
 ### Security Review
 
@@ -63,19 +65,24 @@ When conducting code reviews:
 
 ## Common Issues to Flag
 
+- **TDD violations**: Production code without corresponding tests written first
 - Missing error handling
 - Inconsistent naming conventions
 - Lack of documentation or comments
 - Hardcoded values that should be configurable
 - Unused variables or imports
 - Potential race conditions in concurrent code
-- Missing or inadequate tests
+- Missing or inadequate tests (especially regression tests for bug fixes)
 - Security vulnerabilities
 - Performance anti-patterns
 - Violation of SOLID principles
-- Missing type annotations on function parameters or return values
-- Inconsistent or incorrect type hints
-- Use of deprecated typing syntax (e.g., List instead of list in Python 3.9+)
+- **Missing type annotations** on function parameters or return values
+- **Incorrect type hints** that don't match implementation
+- Use of deprecated typing syntax (e.g., `List` instead of `list`, `Union` instead of `|`)
+- **Ruff violations**: Code that doesn't pass `ruff format --check` or `ruff check`
+- **Mypy errors**: Code that doesn't pass `mypy .` in strict mode
+- **Test warnings**: Tests that generate warnings (should use `-W error`)
+- **Low coverage**: Code changes without adequate test coverage (< 70%)
 
 ## Review Approval Criteria
 
@@ -94,14 +101,16 @@ Before approving or merging code, verify the following:
 
 - [ ] **Style & Lint**: Does the code pass automated style checks?
 
-  - Run `ruff check .` - no lint errors or format issues
+  - Run `ruff format --check .` - no formatting issues
+  - Run `ruff check .` - no lint errors
   - No PEP 8 violations
   - Code is cleanly formatted
 
 - [ ] **Naming**: Are all new variables, functions, classes named according to conventions?
-  - Descriptive, correct case, no typos
+  - Descriptive, correct case (snake_case for functions, PascalCase for classes)
   - Public API names make sense in context
-  - Follow naming conventions (snake_case for functions, PascalCase for classes)
+  - Follow PEP 8 naming conventions
+  - No typos or abbreviations (except common ones like `df`, `api`, `url`)
 
 ### Documentation
 
@@ -119,33 +128,45 @@ Before approving or merging code, verify the following:
   - CHANGELOG updated with changes
 
 - [ ] **Type Annotations**: Are functions and methods properly type-hinted?
-  - Modern Python 3.9+ syntax (`list`, `dict`, not `List`, `Dict`)
-  - Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
-  - Use `X | None` instead of `Optional[X]` (Python 3.10+)
-  - Run `mypy` in strict mode - no typing issues
-  - Types are readable and necessary
+  - Modern Python 3.10+ syntax (`list`, `dict`, not `List`, `Dict`)
+  - Use `X | Y` instead of `Union[X, Y]`
+  - Use `X | None` instead of `Optional[X]`
+  - Run `mypy .` in strict mode - no typing issues
+  - Types are readable, accurate, and necessary
+  - Return types specified for all functions
+  - Parameter types specified for all function arguments
 
 ### Error Handling & Testing
+
+- [ ] **TDD Compliance**: Were tests written BEFORE implementation code?
+
+  - Check commit history or PR description for test-first approach
+  - Tests should demonstrate behavior before implementation
+  - Red-Green-Refactor cycle followed
 
 - [ ] **Error Handling**: Are exceptions used appropriately?
 
   - No silent `pass` on error
-  - Specific exceptions caught (not blanket `except:`)
+  - Specific exceptions caught (not blanket `except:` or bare `except Exception:`)
   - New errors are handled or explicitly propagated
   - No bare `except` or overly broad catches
+  - Custom exceptions defined when appropriate
 
 - [ ] **Testing**: Is there adequate test coverage?
 
-  - Tests cover new code or bug fix
-  - Tests cover normal cases and edge cases
+  - Tests cover new code or bug fix (especially for bug fixes - regression tests)
+  - Tests cover normal cases and edge cases (empty inputs, None, negative numbers)
   - All tests pass (`pytest`)
-  - Test coverage ≥ 70% (target: 90%)
-  - Test changes reflect intended behavior changes
+  - Test coverage ≥ 70% (target: 90%): `pytest --cov=mypackage`
+  - Tests use AAA pattern (Arrange-Act-Assert)
+  - Tests are isolated and don't depend on each other
+  - Parametrized tests used for multiple similar cases
+  - Mocks used for external dependencies (APIs, databases, file I/O)
 
 - [ ] **Warnings**: Does the code introduce any new warnings?
-  - Run tests with `-W error` to check
-  - Address or filter harmless warnings
+  - Run tests with `-W error` to check: `pytest -W error`
   - No new deprecation or resource warnings
+  - All warnings addressed or explicitly filtered
 
 ### Performance & Security
 
@@ -187,29 +208,37 @@ Before approving or merging code, verify the following:
 
 - [ ] **Commits & Changelog**: Are commits well-formed?
 
-  - Follow Conventional Commits format
+  - Follow Conventional Commits format (`type(scope): description`)
   - CHANGELOG.md updated under "Unreleased" or version section
-  - Commit messages allow changelog generation
+  - Commit messages allow automatic changelog generation
+  - No merge commits in feature branches (use rebase)
 
 - [ ] **Continuous Integration**: Does CI pass?
 
-  - No lint, test, or doc build failures
-  - CI configuration follows best practices
-  - Secure usage of secrets
-  - Efficient caching
+  - No lint errors: `ruff format --check .` and `ruff check .` pass
+  - No type errors: `mypy .` passes
+  - All tests pass: `pytest` succeeds
+  - No doc build failures
+  - Coverage meets threshold (≥ 70%)
+  - Secure usage of secrets (no hardcoded credentials)
+  - Efficient caching configured
 
 - [ ] **Documentation Build**: Do docs build without errors?
 
   - Run `mkdocs build --strict` or `sphinx-build -W`
   - No warnings or errors in doc generation
   - New content included and well-formatted
+  - API docs automatically generated from docstrings
 
 - [ ] **Final Sanity Check**: Does everything work end-to-end?
   - Pull branch fresh, recreate environment
-  - Run full test suite
-  - Quick manual test of main functionality
-  - Installation works from scratch (`pip install .`)
+  - Run `ruff format --check .` and `ruff check .` (no errors)
+  - Run `mypy .` (no type errors)
+  - Run full test suite: `pytest --cov=mypackage -W error` (all pass)
+  - Quick manual test of main functionality if applicable
+  - Installation works from scratch: `pip install -e ".[dev]"`
   - No missing files or packaging issues
+  - Environment setup documented and reproducible
 
 ## Review Comment Template
 
@@ -272,19 +301,22 @@ def process_data(items: list[dict[str, str]], threshold: float | None = None) ->
 
 ### Critical Issues
 
-- **Security vulnerabilities**: SQL injection, XSS, exposed secrets
+- **Security vulnerabilities**: SQL injection, XSS, exposed secrets, hardcoded credentials
 - **Data loss risks**: Missing transaction handling, no backup strategy
 - **Breaking changes**: Without deprecation warnings or major version bump
 - **Race conditions**: In concurrent code without proper synchronization
 - **Memory leaks**: Unclosed resources, circular references
+- **TDD violations**: Production code without tests written first
 
 ### Major Issues
 
 - **Missing error handling**: Functions that can fail but don't handle errors
-- **Inadequate testing**: New features without tests, low coverage
+- **Inadequate testing**: New features without tests, low coverage (< 70%)
+- **Missing type hints**: Functions without type annotations
+- **Type checking failures**: Code that doesn't pass `mypy .` in strict mode
 - **Poor performance**: O(n²) where O(n) is possible, unnecessary database queries
 - **Tight coupling**: Hard dependencies that make testing/reuse difficult
-- **Missing documentation**: Public APIs without docstrings
+- **Missing documentation**: Public APIs without NumPy-style docstrings
 
 ### Minor Issues
 
@@ -292,18 +324,23 @@ def process_data(items: list[dict[str, str]], threshold: float | None = None) ->
 - **Magic numbers**: Hardcoded values that should be constants
 - **Code duplication**: Copy-pasted logic that could be extracted
 - **Overly complex logic**: Could be simplified for readability
-- **Missing type hints**: On public functions or methods
+- **Outdated type syntax**: Using `Union` instead of `|`, `Optional` instead of `X | None`
+- **Import organization**: Not following standard library → third-party → local order
 
 ## Guiding Principles for AI-Assisted Reviews
 
 When using AI to assist with code reviews:
 
-1. **Verify AI suggestions**: Don't blindly accept AI feedback - validate it
-2. **Provide context**: AI needs context about project standards and constraints
-3. **Focus on substance**: AI can catch syntax/style, focus your review on logic and design
-4. **Explain reasoning**: When overriding AI suggestions, document why
-5. **Iterate**: Use AI for initial pass, then do detailed human review
-6. **Learn patterns**: Note recurring issues AI catches to improve your own reviews
+1. **Verify TDD compliance**: Check if tests were written before implementation
+2. **Verify AI suggestions**: Don't blindly accept AI feedback - validate it
+3. **Check type hints**: Ensure all functions have complete type annotations using Python 3.10+ syntax
+4. **Run quality tools**: Execute `ruff`, `mypy`, and `pytest` to verify claims
+5. **Provide context**: AI needs context about project standards and constraints
+6. **Focus on substance**: AI can catch syntax/style, focus your review on logic, design, and TDD compliance
+7. **Explain reasoning**: When overriding AI suggestions, document why
+8. **Iterate**: Use AI for initial pass, then do detailed human review
+9. **Learn patterns**: Note recurring issues AI catches to improve your own reviews
+10. **Verify coverage**: Check actual coverage numbers, not just presence of tests
 
 ## Summary
 
