@@ -46,6 +46,26 @@ Continuous integration is defined in `.github/workflows/ci.yml` and runs on ever
 
 ## Development Workflow
 
+### 🧪 Test-Driven Development (TDD)
+
+All development MUST follow the **Red-Green-Refactor** cycle:
+
+1. **🔴 RED**: Write a failing test that defines desired behavior
+2. **🟢 GREEN**: Write minimal code to make the test pass
+3. **🔵 REFACTOR**: Improve code quality while keeping tests green
+4. **♻️ REPEAT**: Continue with next feature/behavior
+
+```bash
+# Example TDD cycle
+pytest tests/test_new_feature.py::test_specific_case  # Should FAIL (red)
+# ... write implementation ...
+pytest tests/test_new_feature.py::test_specific_case  # Should PASS (green)
+# ... refactor for quality ...
+pytest  # All tests should still pass
+```
+
+See [Testing Guidelines](instructions/my-tests.instructions.md) for detailed TDD workflow.
+
 ### 🚀 Quick Start
 
 Set up your development environment with `mamba` and verify your setup:
@@ -58,8 +78,9 @@ mamba activate <project-name>
 # Install the package in editable mode with dev dependencies
 pip install -e ".[dev]"
 
-# Verify setup by running checks
+# Verify setup by running checks (after initial setup)
 pytest -q
+ruff format --check .
 ruff check .
 mypy .
 ```
@@ -74,7 +95,7 @@ mamba activate <project-name>
 mamba env update -f environment.yml --prune
 
 # Run verification
-pytest -q && ruff check . && mypy .
+pytest -q && ruff format --check . && ruff check . && mypy .
 ```
 
 ### 📝 Commit Guidelines
@@ -116,19 +137,22 @@ Generate issues using templates in `.github/ISSUE_TEMPLATE/`. Required sections:
 **Requirements:**
 
 - Keep PRs small (≤ 300 lines of diff)
-- Include tests for new features and bug fixes
+- Follow TDD: Include tests written BEFORE implementation code
+- Include tests for all new features and bug fixes (regression tests for bugs)
 - Update documentation as needed
-- Ensure all CI checks pass (green status)
+- Ensure all CI checks pass (ruff, mypy, pytest, coverage)
 
 ### 🤖 Task Delegation
 
 When assigned an issue:
 
-1. Plan the work and break it into steps
-2. Open a draft PR early
-3. Run tests locally before pushing
-4. Iterate on reviewer feedback
-5. Ensure all checks pass before requesting final review
+1. **Plan the work** and break it into TDD cycles (test → implementation → refactor)
+2. **Write tests FIRST** for each feature or bug fix
+3. **Open a draft PR early** with initial tests
+4. **Implement in small increments**, running tests after each change
+5. **Run full quality checks locally** before pushing: `ruff format --check . && ruff check . && mypy . && pytest --cov`
+6. **Iterate on reviewer feedback**
+7. **Ensure all CI checks pass** before requesting final review
 
 **AI Agent Control**: See `instructions/taming-copilot.instructions.md` for directives on controlling AI behavior (primacy of user commands, factual verification, surgical code edits).
 
@@ -262,23 +286,23 @@ mamba activate myproject
 
 ### [Coding](instructions/my-code.instructions.md)
 
-Core principles, naming conventions (PEP 8), type hints (Python 3.10+), error handling patterns.
+Test-Driven Development (TDD) workflow, core principles, naming conventions (PEP 8), type hints (Python 3.10+), error handling patterns, Red-Green-Refactor cycle.
 
 ### [Testing](instructions/my-tests.instructions.md)
 
-Pytest framework, AAA pattern, coverage goals (60%→75%→90%), test organization strategies.
+TDD best practices, pytest framework with plugins (pytest-cov, pytest-mock, pytest-xdist), AAA pattern, parametrization, fixtures, coverage goals (70%→90%), test organization strategies.
 
 ### [Documentation](instructions/my-docs.instructions.md)
 
-Documentation standards and best practices for code, APIs, and user guides.
+Documentation standards, NumPy-style docstrings, modern type hints (Python 3.10+), MkDocs with mkdocstrings for API docs, best practices for code, APIs, and user guides.
 
 ### [CI/CD](instructions/my-ci-cd.instructions.md)
 
-Required CI steps (ruff, mypy, pytest), semantic versioning with python-semantic-release, Git Flow branching.
+Required CI steps (ruff format + lint, mypy strict mode, pytest with coverage), ruff and mypy configuration in pyproject.toml, matrix testing across Python versions, semantic versioning with python-semantic-release, Git Flow branching.
 
 ### [Reviewing](instructions/my-review.instructions.md)
 
-Code review guidelines and best practices for pull requests.
+Code review guidelines, TDD compliance checks, Python tooling verification (ruff, mypy, pytest), type annotation validation, best practices for pull requests.
 
 ### [Commit Messages](instructions/my-commit-messages.instructions.md)
 
