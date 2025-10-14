@@ -18,37 +18,110 @@ When creating or modifying CI/CD pipelines:
 
 ### Required CI Steps
 
-Every CI workflow must include:
+Every CI workflow must include (in order):
 
 1. **Environment Setup**
 
    - Use clean base image (Ubuntu latest)
-   - Install Python 3.12+ or project-specified version
-   - Cache dependencies for faster builds
-   - Install dev dependencies: `mamba env create -f environment.yml` or `pip install -r requirements-dev.txt`
+   - Install Python 3.10+ (prefer 3.12 or 3.13)
+   - Cache dependencies for faster builds: `actions/setup-python@v5` with `cache: 'pip'`
+   - Install dependencies: `pip install -e ".[dev]"` or use `mamba env create -f environment.yml`
 
-2. **Code Quality Checks**
+2. **Code Quality Checks** (Fast feedback - fail early)
 
-   - **Ruff**: Primary linter and formatter (replaces flake8, black, isort)
-   - **mypy**: Type checking in strict mode
-   - Treat all warnings as errors (`-W error`)
+   - **Ruff format check**: `ruff format --check .` (verify formatting without changing files)
+   - **Ruff lint**: `ruff check .` (comprehensive linting - replaces flake8, isort, pydocstyle)
+   - **mypy**: `mypy .` (strict type checking with no warnings)
+   - Treat all warnings as errors
 
-3. **Testing**
+3. **Testing** (Only if linting passes)
 
-   - Run full test suite: `pytest --cov=<package>`
+   - Run full test suite: `pytest --cov=<package> -W error`
    - Minimum coverage: 70% (target: 90%)
    - Fail build if coverage drops below threshold
-   - Use pytest with strict settings
+   - Upload coverage to Codecov/Coveralls
 
-4. **Documentation Build**
+4. **Documentation Build** (Optional but recommended)
    - Build docs with warnings as errors
-   - Verify no broken references or syntax issues
+   - Verify no broken references or syntax issues: `mkdocs build --strict` or `sphinx-build -W`
 
 ### CI Configuration
 
 - **Location**: `.github/workflows/ci.yml`
 - **Triggers**: Pull requests and pushes to main/develop branches
-- **Coverage Integration**: Upload to Codecov or Coveralls for tracking
+- **Python versions**: Test on multiple versions (3.10, 3.11, 3.12, 3.13) using matrix strategy
+- **Coverage Integration**: Upload to Codecov with `codecov/codecov-action@v4`
+- **Caching**: Use `actions/setup-python@v5` with `cache: 'pip'` for dependency caching
+
+### Ruff Configuration
+
+Configure ruff in `pyproject.toml` for consistent behavior:
+
+```toml
+[tool.ruff]
+# Target Python 3.10+ for modern syntax
+target-version = "py310"
+
+# Line length (Black standard)
+line-length = 88
+
+# Enable specific rule sets
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+# Ignore specific rules if needed
+ignore = []
+
+# Exclude patterns
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["mypackage"]
+```
+
+### Mypy Configuration
+
+Configure mypy in `pyproject.toml` for strict type checking:
+
+```toml
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+strict = true
+
+# Per-module options (if needed for third-party libraries)
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+```
 
 ## Continuous Deployment (CD)
 
@@ -120,48 +193,81 @@ feat!: remove deprecated API v1 endpoints
 
 **DO**:
 
-- Use official actions from trusted sources
-- Pin action versions for reproducibility
-- Cache dependencies to speed up builds
-- Run linters before tests (fail fast)
-- Generate coverage reports
-- Use matrix strategy only when testing multiple versions
+- Use official actions from trusted sources (GitHub, actions organization)
+- Pin action versions for reproducibility (e.g., `@v4`, `@v5`)
+- Cache dependencies to speed up builds (`cache: 'pip'` in setup-python)
+- Run linters before tests (fail fast on style issues)
+- Generate coverage reports and upload to Codecov
+- Use matrix strategy to test multiple Python versions
 - Add status badges to README
+- Configure ruff and mypy in `pyproject.toml` for consistency
+- Run tests with warnings as errors (`-W error`)
+- Set appropriate coverage thresholds (`--cov-fail-under=70`)
+- Use `if: matrix.python-version == '3.12'` to upload coverage once (not for each version)
 
 **DON'T**:
 
 - Skip linting or testing steps
 - Ignore coverage thresholds
 - Allow warnings to pass silently
-- Hardcode secrets or tokens
+- Hardcode secrets or tokens (use `${{ secrets.SECRET_NAME }}`)
 - Use deprecated actions
 - Run unnecessary steps on every trigger
+- Test on Python versions < 3.10 (focus on modern Python)
+- Mix different formatting/linting tools (use ruff exclusively)
+- Skip type checking (mypy is mandatory)
 
 ## Workflow Template Structure
 
 ```yaml
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
+      
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: "pip"
+      
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Check formatting with Ruff
+        run: ruff format --check .
+      
       - name: Lint with Ruff
         run: ruff check .
+      
       - name: Type check with mypy
         run: mypy .
+      
       - name: Test with pytest
-        run: pytest --cov --cov-report=xml
-      - name: Upload coverage
+        run: |
+          pytest --cov=mypackage --cov-report=xml --cov-report=term-missing -W error
+      
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 ```
 
 ## Guiding Principles for AI Assistance

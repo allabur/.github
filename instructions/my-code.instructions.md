@@ -7,12 +7,13 @@ applyTo: "**/*"
 
 ## Core Principles
 
+- **Test-Driven Development (TDD)**: Write tests FIRST, then implement code. Red → Green → Refactor cycle is mandatory
 - **Readability first**: Clear, expressive logic over clever tricks
 - **Explicit over implicit**: Make intentions obvious
 - **Single Responsibility**: Each function/class does one thing well
 - **DRY**: Don't Repeat Yourself - avoid code duplication
 - **PEP 8 & SOLID**: Follow [PEP 8](https://peps.python.org/pep-0008/) and SOLID design principles
-- **TDD**: Write tests for new features and bug fixes
+- **Type hints everywhere**: All functions must have complete type annotations (Python 3.10+)
 - **No dead code**: Remove unused code (use version control to retrieve if needed)
 
 ## Naming Conventions (PEP 8)
@@ -344,47 +345,184 @@ counts = defaultdict(int)
 word_counts = Counter(words)
 ```
 
+## Test-Driven Development (TDD) Workflow
+
+### The Red-Green-Refactor Cycle
+
+When implementing any new feature or fixing any bug, ALWAYS follow this cycle:
+
+#### 1. 🔴 **RED** - Write a Failing Test
+
+```python
+# tests/test_calculator.py
+def test_add_two_positive_numbers():
+    """Test addition of two positive numbers"""
+    # Arrange
+    calc = Calculator()
+    
+    # Act
+    result = calc.add(2, 3)
+    
+    # Assert
+    assert result == 5
+```
+
+Run the test - it MUST fail because the code doesn't exist yet:
+```bash
+pytest tests/test_calculator.py::test_add_two_positive_numbers  # Should FAIL
+```
+
+#### 2. 🟢 **GREEN** - Write Minimal Code to Pass
+
+```python
+# src/mypackage/calculator.py
+class Calculator:
+    def add(self, a: int, b: int) -> int:
+        """Add two numbers."""
+        return a + b  # Simplest implementation
+```
+
+Run the test - it MUST pass:
+```bash
+pytest tests/test_calculator.py::test_add_two_positive_numbers  # Should PASS
+```
+
+#### 3. 🔵 **REFACTOR** - Improve Code Quality
+
+Now that tests pass, refactor for better design:
+
+```python
+# src/mypackage/calculator.py
+class Calculator:
+    """Performs basic arithmetic operations."""
+    
+    def add(self, a: int | float, b: int | float) -> int | float:
+        """Add two numbers.
+        
+        Parameters
+        ----------
+        a : int | float
+            First number to add.
+        b : int | float
+            Second number to add.
+        
+        Returns
+        -------
+        int | float
+            Sum of the two numbers.
+        
+        Examples
+        --------
+        >>> calc = Calculator()
+        >>> calc.add(2, 3)
+        5
+        """
+        return a + b
+```
+
+Run tests again to ensure refactoring didn't break anything:
+```bash
+pytest tests/test_calculator.py  # Should still PASS
+```
+
+#### 4. ♻️ **REPEAT** - Continue the Cycle
+
+Add more test cases and repeat:
+```python
+def test_add_negative_numbers():
+    calc = Calculator()
+    assert calc.add(-5, -3) == -8
+
+def test_add_floats():
+    calc = Calculator()
+    assert calc.add(2.5, 3.7) == 6.2
+```
+
+### TDD Best Practices
+
+- **Never write production code without a failing test first**
+- **Write the simplest test that could possibly fail**
+- **Take small steps** - one test at a time
+- **Run tests frequently** - after every change
+- **Keep the feedback loop tight** - tests should run in seconds
+- **Use descriptive test names** that document behavior
+- **Refactor only when tests are green**
+
+### TDD for Bug Fixes
+
+When fixing a bug:
+
+1. **Write a test that reproduces the bug** (it will fail)
+2. **Fix the bug** (test should pass)
+3. **Refactor** if needed (test should still pass)
+
+```python
+def test_divide_by_zero_raises_error():
+    """Regression test for issue #42: division by zero crashes"""
+    calc = Calculator()
+    with pytest.raises(ZeroDivisionError):
+        calc.divide(10, 0)
+```
+
 ## Code Quality Checklist
+
+### Before Writing Production Code
+
+- [ ] Have you written a failing test first? (RED)
+- [ ] Does the test clearly specify the expected behavior?
+- [ ] Is the test using the AAA pattern (Arrange-Act-Assert)?
 
 ### Before Committing
 
-- [ ] Passes `ruff format` and `ruff check .`
-- [ ] Passes `mypy` in strict mode
-- [ ] Tests pass, coverage ≥ 70% (target: 90%)
+- [ ] All tests pass: `pytest` (GREEN)
+- [ ] Code is refactored for clarity and maintainability (REFACTOR)
+- [ ] Passes `ruff format .` and `ruff check .` (no errors)
+- [ ] Passes `mypy .` in strict mode (no type errors)
+- [ ] Test coverage ≥ 70% (target: 90%): `pytest --cov=mypackage`
 - [ ] All public functions have NumPy-style docstrings
-- [ ] All functions have type hints
-- [ ] No hardcoded secrets
+- [ ] All functions have complete type hints (parameters and return values)
+- [ ] No hardcoded secrets or credentials
 - [ ] Exceptions handled appropriately
 - [ ] Important operations logged
+- [ ] No dead code or commented-out code
 
 ### DO
 
+- **Follow TDD**: Write tests FIRST, then implement code (Red → Green → Refactor)
 - Write clear, self-documenting code with descriptive names
 - Keep functions small (< 50 lines) with single responsibility
-- Use modern Python features (f-strings, pathlib, dataclasses)
+- Use modern Python features (f-strings, pathlib, dataclasses, pattern matching)
 - Handle errors explicitly with specific exceptions
 - Profile before optimizing
 - Validate external input
 - Use environment variables for secrets
+- Add type hints to ALL functions (parameters and return values)
+- Run `pytest` after every code change to ensure tests still pass
 
 ### DON'T
 
+- **Skip TDD**: Never write production code without a failing test first
 - Use bare `except:` or ignore warnings
 - Hardcode secrets or credentials
 - Premature optimization or overly complex one-liners
 - Copy-paste code instead of refactoring
-- Leave commented-out code
+- Leave commented-out code or dead code
 - Use `from module import *`
 - Mix tabs and spaces
+- Write code without type hints
+- Commit code with failing tests
 
 ## AI Assistant Guidelines
 
-1. Follow these standards strictly
-2. Use modern Python 3.10+ syntax
-3. Prioritize readability over cleverness
-4. Always include type hints and docstrings
-5. Handle errors with specific exceptions
-6. Write testable code with separated concerns
-7. Never hardcode secrets
-8. Profile before optimizing
-9. Keep it simple and clear
+1. **ALWAYS follow TDD**: When asked to implement a feature, generate the test FIRST, then the implementation
+2. Follow these standards strictly
+3. Use modern Python 3.10+ syntax (use `|` for unions, built-in types like `list`, `dict`)
+4. Prioritize readability over cleverness
+5. Always include complete type hints (parameters and return values) using modern syntax
+6. Handle errors with specific exceptions
+7. Write testable code with separated concerns
+8. Never hardcode secrets
+9. Profile before optimizing
+10. Keep it simple and clear
+11. Generate NumPy-style docstrings for all public functions
+12. Run tests after code generation to verify functionality

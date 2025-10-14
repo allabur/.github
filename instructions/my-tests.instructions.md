@@ -9,10 +9,12 @@ applyTo: "**/*.{py,test.py,spec.py}"
 
 When writing tests:
 
-- **Start simple**: Write basic tests first, increase complexity gradually
-- **Test what matters**: Focus on critical functionality and edge cases
-- **Keep tests readable**: Tests should be easy to understand and maintain
-- **Run tests often**: Catch issues early in development
+- **TDD is mandatory**: Write tests BEFORE production code (Red → Green → Refactor)
+- **Test behavior, not implementation**: Focus on what the code does, not how it does it
+- **One assertion per concept**: Each test should verify one specific behavior
+- **Tests as documentation**: Test names and structure should explain what the code does
+- **Fast feedback**: Tests should run quickly (milliseconds for unit tests)
+- **Isolated and independent**: Tests should not depend on each other or on external state
 
 ## Test Framework
 
@@ -220,7 +222,7 @@ def test_order_calculation():
 
 ### Parametrized Tests
 
-Test multiple inputs efficiently:
+Test multiple inputs efficiently with `@pytest.mark.parametrize`:
 
 ```python
 @pytest.mark.parametrize("input,expected", [
@@ -231,6 +233,88 @@ Test multiple inputs efficiently:
 ])
 def test_square_numbers(input, expected):
     assert square(input) == expected
+```
+
+**Advanced parametrization** with test IDs for better output:
+
+```python
+@pytest.mark.parametrize(
+    "email,is_valid",
+    [
+        ("user@example.com", True),
+        ("user.name+tag@example.co.uk", True),
+        ("invalid-email", False),
+        ("@example.com", False),
+        ("user@", False),
+    ],
+    ids=["standard", "complex", "no-at", "no-user", "no-domain"]
+)
+def test_email_validation(email, is_valid):
+    assert validate_email(email) == is_valid
+```
+
+### Mocking with pytest-mock
+
+Use `pytest-mock` for cleaner mocking syntax:
+
+```bash
+pip install pytest-mock
+```
+
+```python
+def test_api_call_with_mock(mocker):
+    """Test API call using pytest-mock"""
+    # Mock the requests.get call
+    mock_get = mocker.patch('requests.get')
+    mock_get.return_value.json.return_value = {"status": "success"}
+    mock_get.return_value.status_code = 200
+    
+    # Call the function
+    result = fetch_data("https://api.example.com")
+    
+    # Verify the result
+    assert result["status"] == "success"
+    # Verify the mock was called correctly
+    mock_get.assert_called_once_with("https://api.example.com")
+```
+
+### Pytest Plugins
+
+Essential pytest plugins for Python projects:
+
+```bash
+pip install pytest pytest-cov pytest-mock pytest-xdist pytest-timeout
+```
+
+- **pytest-cov**: Coverage reporting
+- **pytest-mock**: Simplified mocking with `mocker` fixture
+- **pytest-xdist**: Run tests in parallel (`pytest -n auto`)
+- **pytest-timeout**: Prevent hanging tests (`@pytest.mark.timeout(5)`)
+
+### Using pytest.ini or pyproject.toml
+
+Configure pytest behavior in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=mypackage",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=70",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
 ```
 
 ## Assertions Best Practices
@@ -381,11 +465,17 @@ def test_search_performance():
 # Run all tests
 pytest
 
+# Run with verbose output
+pytest -v
+
 # Run specific test file
 pytest tests/test_calculator.py
 
 # Run specific test function
 pytest tests/test_calculator.py::test_add_two_numbers
+
+# Run tests matching a pattern
+pytest -k "test_add"
 
 # Stop on first failure (useful for debugging)
 pytest -x
@@ -393,73 +483,158 @@ pytest -x
 # Run only failed tests from last run
 pytest --lf
 
+# Run tests in parallel (requires pytest-xdist)
+pytest -n auto
+
 # Show print statements (useful for debugging)
 pytest -s
+
+# Run with coverage
+pytest --cov=mypackage --cov-report=term-missing
+
+# Generate HTML coverage report
+pytest --cov=mypackage --cov-report=html
+# Then open htmlcov/index.html in browser
+```
+
+### TDD Workflow Integration
+
+During TDD cycle, use these commands:
+
+```bash
+# 1. RED: Run new failing test
+pytest tests/test_new_feature.py::test_specific_case -v
+
+# 2. GREEN: Run same test after implementation
+pytest tests/test_new_feature.py::test_specific_case -v
+
+# 3. REFACTOR: Run all tests to ensure nothing broke
+pytest
+
+# Quick feedback loop: Run tests on file save
+pytest-watch  # or use `ptw` (install with: pip install pytest-watch)
 ```
 
 ### Warnings Configuration
 
-**For beginners** (less strict, focus on learning):
+**Recommended approach** (progressive strictness):
 
 ```bash
-# Show warnings but don't fail
+# Default: Show warnings
 pytest
 
-# Show summary of warnings at the end
-pytest -rw
+# Show detailed warning information
+pytest -v -rA
+
+# Treat specific warnings as errors (good for CI)
+pytest -W error::DeprecationWarning -W error::UserWarning
+
+# Eventually: Treat all warnings as errors (strict mode for mature projects)
+pytest -W error
 ```
 
-**As you progress** (more strict):
+**Configure in pyproject.toml**:
 
-```bash
-# Show detailed warnings
-pytest -W default
-
-# Eventually: treat specific warnings as errors
-pytest -W error::DeprecationWarning
+```toml
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",  # Treat all warnings as errors
+    "ignore::DeprecationWarning:some_module",  # Ignore specific warnings if needed
+]
 ```
-
-**Note**: Don't use `-W error` globally while learning - it's too strict and can be discouraging.
 
 ## CI/CD Integration
 
 ### Basic Test Command
 
-In CI, run tests with coverage:
+In CI, run tests with coverage and strict settings:
 
 ```bash
-pytest --cov=mypackage --cov-report=xml --cov-report=term
+pytest --cov=mypackage --cov-report=xml --cov-report=term-missing --strict-markers -W error
 ```
 
 ### Coverage Thresholds
 
-Start with relaxed thresholds and tighten over time:
+Set appropriate thresholds based on project maturity:
 
-```ini
-# pytest.ini or pyproject.toml
-[tool:pytest]
-addopts = --cov=mypackage --cov-fail-under=60
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=mypackage",
+    "--cov-fail-under=70",  # Start with 70%, work toward 90%
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+```
+
+### GitHub Actions Example
+
+```yaml
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=mypackage --cov-report=xml --cov-report=term-missing -W error
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
 ```
 
 ## Best Practices
 
 ### DO
 
-- Write tests for new features before marking them complete - TDD paradigms
-- Test edge cases (empty lists, None values, negative numbers)
-- Use descriptive test names that explain what's being tested
-- Keep tests simple and focused on one behavior
-- Use fixtures to avoid code duplication
-- Run tests before committing code
+- **Write tests FIRST** before production code (TDD Red-Green-Refactor cycle)
+- Test behavior and public interfaces, not implementation details
+- Test edge cases (empty lists, None values, negative numbers, boundary conditions)
+- Use descriptive test names that explain behavior (not just "test_function_1")
+- Keep tests simple and focused on one behavior per test
+- Use fixtures to avoid code duplication and setup/teardown
+- Use parametrize for testing multiple similar cases
+- Run tests frequently during development (after every small change)
+- Run full test suite before committing code
+- Use mocks/patches for external dependencies (APIs, databases, file system)
+- Add regression tests for every bug fix
+- Keep test execution fast (< 1 second for unit tests)
 
 ### DON'T
 
-- Skip writing tests because you're "just learning"
-- Test implementation details (test behavior, not internals)
+- Write production code without a failing test first (breaks TDD)
+- Test implementation details that may change during refactoring
 - Write overly complex tests that are hard to understand
 - Ignore failing tests or mark them as "skip" without a plan to fix
 - Copy-paste test code without understanding it
-- Let warnings pile up (address them gradually)
+- Let warnings pile up (address them immediately with `-W error`)
+- Create test interdependencies (tests should be isolated)
+- Use sleep() to fix timing issues (use proper mocks/synchronization)
+- Test private methods directly (test through public interface)
+- Write tests that depend on external services without mocking
 
 ## Getting Started
 
@@ -489,10 +664,15 @@ pytest tests/test_example.py
 
 When generating or modifying tests:
 
-1. **Match skill level**: Generate simple, clear tests for beginners
-2. **Provide context**: Explain what the test does and why
-3. **Use fixtures appropriately**: Show how to avoid duplication
-4. **Include assertions**: Every test needs at least one `assert`
-5. **Test edge cases**: But don't overwhelm with too many at once
-6. **Keep warnings visible**: Show warnings but don't fail on them initially
-7. **Encourage gradual improvement**: Start with basic coverage, improve over time
+1. **ALWAYS generate tests FIRST** before implementation code (TDD approach)
+2. **Follow the AAA pattern** strictly: Arrange-Act-Assert with blank lines between sections
+3. **Use descriptive names**: Test names should describe behavior being tested
+4. **Generate parametrized tests** when testing multiple similar cases
+5. **Include edge cases**: Test empty inputs, None, negative numbers, boundaries
+6. **Use fixtures** for common setup to avoid duplication
+7. **Mock external dependencies**: Use `pytest-mock` for APIs, databases, file I/O
+8. **Configure pytest properly**: Show how to add markers, coverage settings in `pyproject.toml`
+9. **Keep tests isolated**: Each test should be independent and not rely on others
+10. **Make tests fast**: Unit tests should run in milliseconds, use mocks for slow operations
+11. **Provide running instructions**: Show exact pytest commands to run the tests
+12. **Treat warnings as errors**: Configure `-W error` in CI to catch all warnings

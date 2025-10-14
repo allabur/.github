@@ -70,48 +70,86 @@ def function_name(param1: type1, param2: type2) -> return_type:
 
 ## Documentation Tooling
 
-### For Simple to Medium Projects
+### Recommended: MkDocs with Material Theme
 
-Use **MkDocs** with **mkdocstrings** plugin:
+Use **MkDocs** with **mkdocstrings[python]** plugin for automatic API documentation from docstrings:
 
 ```bash
-
 # Install
-
 pip install mkdocs mkdocs-material mkdocstrings[python]
 
-# Create basic config (mkdocs.yml)
+# Create basic mkdocs.yml configuration
+site_name: My Project
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
 
-# Build docs
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
 
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - admonition
+  - codehilite
+
+# Build docs (fail on warnings)
 mkdocs build --strict
 
-# Serve locally
-
+# Serve locally for preview
 mkdocs serve
 ```
 
-**Benefits**: Simple setup, Markdown-native, excellent Material theme, automatic API doc generation.
+**Benefits**: 
+- Simple Markdown-based documentation
+- Automatic API docs from NumPy-style docstrings
+- Beautiful Material theme
+- Fast builds and live reloading
+- Easy GitHub Pages deployment
 
-### For Complex Projects
+### Alternative: Sphinx for Large Projects
 
-Use **Sphinx** with Napoleon extension:
+Use **Sphinx** with Napoleon extension for complex documentation needs:
 
 ```bash
 # Install
-
 pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
 
-# Initialize
-
+# Initialize in docs/ directory
 sphinx-quickstart docs
 
-# Build with warnings as errors
+# Configure docs/conf.py
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',  # NumPy-style docstrings
+    'sphinx.ext.viewcode',
+    'sphinx_autodoc_typehints',
+]
+napoleon_numpy_docstring = True
 
-sphinx-build -W docs docs/\_build
+# Build with warnings as errors
+sphinx-build -W docs docs/_build
 ```
 
-**Benefits**: Advanced features, multiple output formats, extensive customization.
+**Benefits**: 
+- Advanced features (cross-references, multiple output formats)
+- Extensive customization
+- Industry standard for large projects
 
 ## Required Documentation Files
 
@@ -192,47 +230,65 @@ Choose appropriate license:
 
 ## Type Hints
 
-ALL function signatures MUST include type hints using modern Python 3.9+ syntax:
+ALL function signatures MUST include type hints using modern Python 3.10+ syntax:
 
 ```python
 def process_data(
     data: list[dict[str, int | str]],
-    threshold: float | None = None
+    threshold: float | None = None,
 ) -> dict[str, int]:
     """Process data with optional threshold."""
     pass
 ```
 
-**Modern syntax guidelines (Python 3.9+)**:
+**Modern syntax guidelines (Python 3.10+)**:
 
-- Use built-in types: `list`, `dict`, `set`, `tuple` instead of `List`, `Dict`, `Set`, `Tuple`
-- Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
-- Use `X | None` instead of `Optional[X]` (Python 3.10+)
-- Import from `typing` only for special types: `TypeVar`, `Protocol`, `Literal`, etc.
+- Use built-in types: `list`, `dict`, `set`, `tuple` instead of importing from `typing`
+- Use `X | Y` instead of `Union[X, Y]`
+- Use `X | None` instead of `Optional[X]`
+- Import from `typing` only for special types: `TypeVar`, `Protocol`, `Literal`, `Callable`, etc.
+- Import from `collections.abc` for abstract types: `Sequence`, `Mapping`, `Iterable`, etc.
 
 **Example with advanced types**:
 
 ```python
-from collections.abc import Callable, Iterable, Sequence
-from typing import TypeVar, Protocol
+from collections.abc import Callable, Sequence
+from typing import TypeVar, Literal
 
 T = TypeVar('T')
 
 def transform(
     items: Sequence[T],
-    func: Callable[[T], str]
+    func: Callable[[T], str],
+    mode: Literal["fast", "slow"] = "fast",
 ) -> list[str]:
-    """Transform items using provided function."""
+    """Transform items using provided function.
+    
+    Parameters
+    ----------
+    items : Sequence[T]
+        Input items to transform.
+    func : Callable[[T], str]
+        Transformation function.
+    mode : Literal["fast", "slow"], optional
+        Processing mode, by default "fast".
+    
+    Returns
+    -------
+    list[str]
+        Transformed items.
+    """
     return [func(item) for item in items]
 ```
 
-Benefits:
+**Benefits**:
 
 - Cleaner, more readable syntax
 - Native Python support (no imports for basic types)
 - Enables static type checking with mypy
-- Enhances IDE autocomplete
-- Reduces runtime errors
+- Enhances IDE autocomplete and refactoring
+- Catches type-related errors before runtime
+- Self-documenting code
 
 ## Inline Comments
 
@@ -275,29 +331,52 @@ For large modules, use section headers:
 Add to `.github/workflows/ci.yml`:
 
 ```yaml
+- name: Check docstring coverage
+  run: |
+    pip install interrogate
+    interrogate -v --fail-under=80 src/
 
 - name: Build documentation
   run: |
-  mkdocs build --strict # For MkDocs
-
-  # OR
-
-  sphinx-build -W docs docs/\_build # For Sphinx
-
-- name: Check docstring coverage
-  run: |
-  interrogate -v --fail-under=80 src/
+    pip install mkdocs mkdocs-material mkdocstrings[python]
+    mkdocs build --strict
+  # OR for Sphinx:
+  # pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
+  # sphinx-build -W docs docs/_build
 ```
 
-### Auto-Deploy Documentation
+### Auto-Deploy Documentation to GitHub Pages
 
-Deploy to GitHub Pages on release:
+Deploy to GitHub Pages on pushes to main:
 
 ```yaml
-- name: Deploy docs
-  if: github.event_name == 'release'
-  run: |
-  mkdocs gh-deploy --force
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      
+      - name: Install dependencies
+        run: |
+          pip install mkdocs mkdocs-material mkdocstrings[python]
+      
+      - name: Deploy docs
+        run: mkdocs gh-deploy --force
 ```
 
 ## Best Practices for AI Assistance
