@@ -38,8 +38,6 @@ This is a **default `.github` repository** for the `allabur` GitHub account. All
 | mypy   | Type Checking          | Latest  |
 | mamba  | Environment Management | Latest  |
 
-**Other Languages**: For C#/.NET projects, see `refs/feedbackflow/AGENTS.MD` for dotnet-specific commands and patterns.
-
 ### CI/CD
 
 Continuous integration is defined in `.github/workflows/ci.yml` and runs on every push and pull request.
