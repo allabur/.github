@@ -14,12 +14,13 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 ### 🤖 AI Agent Configuration
 
 - **[copilot-instructions.md](copilot-instructions.md)**: Main instructions for GitHub Copilot
-- **[instructions/](instructions/)**: Modular coding guidelines
-  - Coding standards (PEP 8, type hints, error handling)
-  - Testing guidelines (pytest, AAA pattern, coverage)
-  - Documentation standards (NumPy-style docstrings)
-  - CI/CD workflows (conventional commits, semantic release)
-  - Code review guidelines
+- **[instructions/](instructions/)**: Modular coding guidelines with TDD focus
+  - **Test-Driven Development** (Red-Green-Refactor cycle)
+  - Coding standards (PEP 8, type hints Python 3.10+, error handling)
+  - Testing guidelines (pytest with plugins, AAA pattern, TDD workflow, coverage)
+  - Documentation standards (NumPy-style docstrings, MkDocs, modern type hints)
+  - CI/CD workflows (ruff, mypy, pytest, matrix testing, semantic release)
+  - Code review guidelines (TDD compliance, type checking verification)
   - Taming Copilot meta-instructions
 - **[prompts/](prompts/)**: Task-specific reusable prompts
   - `/analyze-dataframe` - Data quality assessment
@@ -34,7 +35,12 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 
 ### ⚙️ Workflows
 
-- **ci.yml**: Continuous integration (ruff, mypy, pytest)
+- **ci.yml**: Continuous integration with TDD validation
+  - Code formatting: `ruff format --check`
+  - Linting: `ruff check` (replaces flake8, black, isort)
+  - Type checking: `mypy` in strict mode
+  - Testing: `pytest` with coverage (≥ 70%)
+  - Matrix testing: Python 3.10, 3.11, 3.12, 3.13
 - **release.yml**: Semantic versioning releases from main
 - **pre-release.yml**: RC releases from develop
 - **dependabot.yml**: Automated dependency updates
@@ -54,13 +60,28 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 ### For Python Projects
 
 ```bash
-# Environment setup
+# Environment setup (mamba or pip)
 mamba env create -f environment.yml
 mamba activate project-name
 pip install -e ".[dev]"
 
-# Verify setup
-pytest -q && ruff check . && mypy .
+# Verify setup - TDD workflow ready
+ruff format --check . && ruff check . && mypy . && pytest -q
+```
+
+### TDD Workflow
+
+All development follows the Red-Green-Refactor cycle:
+
+```bash
+# 1. RED: Write failing test
+pytest tests/test_feature.py::test_new_behavior  # Should FAIL
+
+# 2. GREEN: Implement minimal code
+pytest tests/test_feature.py::test_new_behavior  # Should PASS
+
+# 3. REFACTOR: Improve code quality
+pytest  # All tests should still pass
 ```
 
 ### Using Copilot Prompts
@@ -111,7 +132,7 @@ This repository serves three purposes:
 
 1. **Default Health Files**: GitHub automatically uses these for any repo without its own versions
 2. **Reusable Workflows**: Shared CI/CD that can be referenced from other repos
-3. **AI Agent Guidelines**: Centralized instructions, prompts, and modes for consistent AI assistance
+3. **AI Agent Guidelines**: Centralized TDD-focused instructions, prompts, and modes for consistent Python development with pytest, ruff, and mypy
 
 ## Contributing
 
