@@ -1,78 +1,15 @@
-# Dependabot configuration for Python projects
-# Automatically updates dependencies and creates pull requests
-# Documentation: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
-  # Python dependencies via pip/uv (reads pyproject.toml, requirements.txt)
-  # Note: Dependabot uses pip ecosystem for pyproject.toml and uv
-  # Conda/mamba dependencies in environment.yml are NOT supported by Dependabot
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "America/Los_Angeles"
-
-    # Commit message configuration (Conventional Commits)
-    commit-message:
-      prefix: "deps"
-      prefix-development: "deps-dev"
-      include: "scope"
-
-    # PR customization
-    labels:
-      - "dependencies"
-      - "python"
-
-    # Limit open PRs to avoid overwhelming CI
-    open-pull-requests-limit: 5
-
-    # Group minor and patch updates together
-    groups:
-      python-minor-patch:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
-    # Ignore major version updates for stable dependencies (uncomment to use)
-    # ignore:
-    #   - dependency-name: "pandas"
-    #     update-types: ["version-update:semver-major"]
-    #   - dependency-name: "numpy"
-    #     update-types: ["version-update:semver-major"]
-
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 10
 
-    commit-message:
-      prefix: "ci"
-
-    labels:
-      - "dependencies"
-      - "github-actions"
-
-    groups:
-      github-actions:
-        patterns:
-          - "*"
-
-  # Docker (if your project uses Docker)
-  # Uncomment if needed
-  # - package-ecosystem: "docker"
-  #   directory: "/"
-  #   schedule:
-  #     interval: "weekly"
-  #
-  #   commit-message:
-  #     prefix: "deps(docker)"
-  #
-  #   labels:
-  #     - "dependencies"
-  #     - "docker"
+  # Python dependencies (si usas pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
