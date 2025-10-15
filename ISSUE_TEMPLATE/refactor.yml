@@ -1,0 +1,28 @@
+name: Refactor
+description: Non-functional code improvements
+title: "refactor: <concise summary>"
+labels: ["type:refactor", "status:triage", "tech-debt"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is being refactored and why?
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks/impact
+      description: Potential regressions, interfaces touched
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] No behavior change (existing tests still pass)
+        - [ ] Cyclomatic complexity reduced in X
+        - [ ] Docs updated if public API names change
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: Clarify what won't be changed (APIs, behavior, formats)

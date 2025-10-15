@@ -1,0 +1,46 @@
+{
+  "chat.promptFilesRecommendations": {
+    // Python files - suggest documentation, testing, and optimization
+    "**/*.py": [
+      ".github/prompts/document-function.prompt.md",
+      ".github/prompts/generate-pytest.prompt.md",
+      ".github/prompts/optimize-code.prompt.md"
+    ],
+
+    // Jupyter notebooks - suggest data analysis and table creation
+    "**/*.ipynb": [
+      ".github/prompts/analyze-dataframe.prompt.md",
+      ".github/prompts/create-latex-table.prompt.md",
+      ".github/prompts/document-function.prompt.md"
+    ],
+
+    // Test files - prioritize test generation
+    "**/test_*.py": [".github/prompts/generate-pytest.prompt.md"],
+    "**/tests/**/*.py": [".github/prompts/generate-pytest.prompt.md"],
+
+    // LaTeX files - suggest table creation
+    "**/*.tex": [".github/prompts/create-latex-table.prompt.md"],
+
+    // Data files - suggest analysis and table formatting
+    "**/*.csv": [
+      ".github/prompts/analyze-dataframe.prompt.md",
+      ".github/prompts/create-latex-table.prompt.md"
+    ],
+    "**/*.xlsx": [
+      ".github/prompts/analyze-dataframe.prompt.md",
+      ".github/prompts/create-latex-table.prompt.md"
+    ],
+    "**/*.parquet": [".github/prompts/analyze-dataframe.prompt.md"],
+
+    // AI prompt files - suggest safety review
+    "**/*.prompt.md": [
+      ".github/prompts/ai-prompt-engineering-safety-review.prompt.md"
+    ],
+    "**/*.chatmode.md": [
+      ".github/prompts/ai-prompt-engineering-safety-review.prompt.md"
+    ],
+
+    // Git commit messages - suggest review
+    ".git/COMMIT_EDITMSG": [".github/prompts/review-commit.prompt.md"]
+  }
+}

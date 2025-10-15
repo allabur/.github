@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a bug or regression
+title: "fix: <concise summary>"
+labels: ["type:bug", "status:triage"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version/commit
+      description: Tag or commit SHA where you observed the bug
+      placeholder: e.g. v0.3.1 or 1a2b3c4
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal, reproducible example
+      placeholder: |
+        1. Run `chum stats --window 7`
+        2. Observe ValueError on empty input
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - S1 - Critical (production down / data loss)
+        - S2 - High (major functionality broken)
+        - S3 - Medium (workaround exists)
+        - S4 - Low (minor / cosmetic)
+    validations:
+      required: false
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Python, packages (paste `pip freeze` snippet if relevant)
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs/traceback
+      render: shell
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints / suspected area
+      description: Performance, data size, concurrency, security, or module(s) implicated.
