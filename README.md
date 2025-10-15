@@ -128,3 +128,18 @@ See individual READMEs:
 - [VS Code Copilot Instructions](https://aka.ms/vscode-instructions-docs)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Python Semantic Release](https://python-semantic-release.readthedocs.io/)
+
+## Reference Projects
+
+This repository serves as a reference for other projects:
+
+- **Default Community Health Files**: Automatically applied to all repositories under `allabur` account
+- **Reusable Workflows**: CI/CD workflows that can be referenced from other repositories
+- **AI Agent Standards**: Standardized instructions for GitHub Copilot and other AI assistants
+- **Python Best Practices**: Comprehensive guidelines for Python project development
+
+Projects using these standards benefit from:
+- Consistent code quality and testing practices
+- Automated versioning and release management
+- Standardized PR and issue workflows
+- AI-assisted development with context-aware suggestions

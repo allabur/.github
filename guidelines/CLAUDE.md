@@ -192,6 +192,132 @@ LOG_LEVEL=INFO
 
 See **[CONFIGURATION.md](CONFIGURATION.md)** for complete configuration reference.
 
+## Branching Strategy and Development Workflow
+
+This repository follows a Git Flow-inspired branching strategy adapted for Python projects with semantic versioning.
+
+### Branch Structure
+
+- **main**: Production-ready code, all releases are tagged from here
+- **develop**: Integration branch for ongoing development (auto-updated from main after releases)
+- **feature/**: New features and enhancements (branched from develop)
+- **fix/**: Bug fixes (branched from develop)
+- **docs/**: Documentation improvements (branched from develop)
+- **hotfix/**: Emergency fixes for production (branched from main)
+- **release/**: Release preparation branches (branched from develop)
+
+### Development Workflow
+
+#### Starting New Work
+
+```bash
+# For new features
+git checkout develop
+git pull origin develop
+git checkout -b feature/my-feature
+
+# For bug fixes
+git checkout develop
+git pull origin develop
+git checkout -b fix/bug-description
+
+# For hotfixes
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-issue
+```
+
+#### During Development
+
+1. **Make changes** following the coding guidelines
+2. **Write tests** for new functionality (pytest with AAA pattern)
+3. **Check quality** regularly:
+   ```bash
+   ruff check .
+   mypy --strict src/
+   pytest --cov=mypackage
+   ```
+4. **Commit** using conventional commit format:
+   ```bash
+   git commit -m "feat: add new functionality"
+   git commit -m "fix: resolve edge case in parser"
+   git commit -m "docs: update API documentation"
+   ```
+
+#### Finishing Work
+
+```bash
+# Push your branch
+git push origin feature/my-feature
+
+# Create Pull Request to develop (or main for hotfixes)
+# PR will trigger CI: ruff, mypy, pytest with coverage
+
+# After approval and merge, delete feature branch
+git branch -d feature/my-feature
+```
+
+### Merge Strategies
+
+- **Feature → develop**: Squash and merge (clean history)
+- **Fix → develop**: Squash and merge
+- **Docs → develop**: Squash and merge
+- **Hotfix → main**: Merge commit (preserve hotfix context)
+- **Release → main**: Merge commit (preserve release context)
+- **After release**: develop is auto-updated from main
+
+### Release Process
+
+1. **Create release branch** from develop:
+   ```bash
+   git checkout develop
+   git checkout -b release/v1.2.0
+   ```
+
+2. **Prepare release**:
+   - Update version in `pyproject.toml`
+   - Update `CHANGELOG.md`
+   - Run full test suite
+   - Fix any last-minute issues
+
+3. **Merge to main**:
+   ```bash
+   git checkout main
+   git merge --no-ff release/v1.2.0
+   git tag -a v1.2.0 -m "Release version 1.2.0"
+   git push origin main --tags
+   ```
+
+4. **Auto-update develop**:
+   ```bash
+   git checkout develop
+   git merge main
+   git push origin develop
+   ```
+
+5. **Delete release branch**:
+   ```bash
+   git branch -d release/v1.2.0
+   ```
+
+### Semantic Versioning
+
+Commit messages determine version bumps (automated via python-semantic-release):
+
+- **feat:** → Minor version bump (1.1.0 → 1.2.0)
+- **fix:** → Patch version bump (1.1.0 → 1.1.1)
+- **BREAKING CHANGE:** → Major version bump (1.1.0 → 2.0.0)
+- **docs:**, **style:**, **refactor:**, **test:**, **chore:** → No version bump
+
+### Best Practices
+
+1. **Keep branches short-lived**: Merge features frequently to avoid conflicts
+2. **Rebase before PR**: Keep your branch up to date with develop
+3. **One concern per PR**: Separate features, fixes, and refactorings
+4. **Write tests first**: TDD approach ensures better code quality
+5. **Use conventional commits**: Enables automatic versioning and changelog generation
+6. **Review before merge**: All PRs require review and passing CI
+
 ## Documentation Requirements
 
 **⚠️ MANDATORY**: Always update documentation when making changes:
