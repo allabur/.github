@@ -10,7 +10,7 @@ This is a **default `.github` repository** for the `allabur` GitHub account. All
 - **Reusable Workflows**: Shared CI/CD workflows in `workflows/`
 - **AI Agent Instructions**: Modular guidelines in `instructions/` for coding, testing, commits, CI/CD, reviews, and docs
 - **Chat Modes & Prompts**: AI agent personas (`chatmodes/`) and reusable prompts (`prompts/`)
-- **Reference Projects**: `refs/` contains external projects for studying patterns (awesome-copilot, feedbackflow)
+- **Guidelines**: Comprehensive documentation in `guidelines/` for Python project development
 
 **How to Extend**: Create project-specific `.github/copilot-instructions.md` in individual repos to override or augment these defaults. Reference detailed guidelines via: `[Coding](instructions/my-code.instructions.md)`
 
@@ -144,9 +144,8 @@ When assigned an issue:
 ├── instructions/       # Modular AI agent instructions (*.instructions.md)
 ├── chatmodes/          # AI personas for specialized assistance (*.chatmode.md)
 ├── prompts/            # Reusable task-specific prompts (*.prompt.md)
-├── refs/               # Reference projects for studying patterns
-│   ├── awesome-copilot/    # GitHub Copilot customizations collection
-│   └── feedbackflow/       # C#/.NET reference project
+├── guidelines/         # Comprehensive Python project guidelines
+├── docs/               # Documentation and guides
 ├── ISSUE_TEMPLATE/     # Org-wide issue templates
 ├── copilot-instructions.md # This file (overview for AI agents)
 ├── PULL_REQUEST_TEMPLATE.md

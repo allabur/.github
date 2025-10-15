@@ -39,13 +39,14 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 - **pre-release.yml**: RC releases from develop
 - **dependabot.yml**: Automated dependency updates
 
-### 📚 Reference Projects
-
-- **[refs/awesome-copilot/](refs/awesome-copilot/)**: GitHub Copilot customizations collection
-- **[refs/feedbackflow/](refs/feedbackflow/)**: C#/.NET reference patterns
-
 ### 📖 Documentation
 
+- **[guidelines/](guidelines/)**: Comprehensive guidelines for Python projects
+  - Architecture patterns and project structure
+  - Coding standards and best practices
+  - Testing methodology with pytest
+  - Configuration management
+  - Contribution and commit guidelines
 - **[docs/prompts-quick-reference.md](docs/prompts-quick-reference.md)**: Prompt commands cheat sheet
 - **[docs/prompt-recommendations-config.md](docs/prompt-recommendations-config.md)**: Auto-suggestion configuration
 
