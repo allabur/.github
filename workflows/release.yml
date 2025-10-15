@@ -1,19 +1,33 @@
 name: Release
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
+    name: Semantic Release
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necesario para semantic-release
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: pip install python-semantic-release build
-      - run: semantic-release publish
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install python-semantic-release==9.*
+
+      - name: Semantic Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: semantic-release version && semantic-release publish

@@ -1,20 +1,33 @@
-# .github/workflows/pre-release.yml
-name: Pre-Release (develop)
+name: Pre-Release
+
 on:
   push:
     branches: [develop]
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
-  prerelease:
+  pre-release:
+    name: Pre-Release (RC)
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: pip install python-semantic-release build
-      - run: semantic-release publish --prerelease --prerelease-tag rc
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install python-semantic-release==9.*
+
+      - name: Pre-Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Opcional para TestPyPI:
-          # PYPI_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          semantic-release version --prerelease
+          semantic-release publish --prerelease
