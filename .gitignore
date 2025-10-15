@@ -13,12 +13,9 @@ Thumbs.db
 .Spotlight-V100
 .Trashes
 
-# Oh My Zsh (installed automatically, not tracked)
-.oh-my-zsh/
-
 # Private files (credentials, tokens, personal data)
 .private
 *.private
 
 # Reference repositories (external dotfiles for comparison)
-refs/
+**/refs/
