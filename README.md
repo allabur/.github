@@ -39,13 +39,14 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 - **pre-release.yml**: RC releases from develop
 - **dependabot.yml**: Automated dependency updates
 
-### 📚 Reference Projects
-
-- **[refs/awesome-copilot/](refs/awesome-copilot/)**: GitHub Copilot customizations collection
-- **[refs/feedbackflow/](refs/feedbackflow/)**: C#/.NET reference patterns
-
 ### 📖 Documentation
 
+- **[guidelines/](guidelines/)**: Comprehensive guidelines for Python projects
+  - Architecture patterns and project structure
+  - Coding standards and best practices
+  - Testing methodology with pytest
+  - Configuration management
+  - Contribution and commit guidelines
 - **[docs/prompts-quick-reference.md](docs/prompts-quick-reference.md)**: Prompt commands cheat sheet
 - **[docs/prompt-recommendations-config.md](docs/prompt-recommendations-config.md)**: Auto-suggestion configuration
 
@@ -127,3 +128,18 @@ See individual READMEs:
 - [VS Code Copilot Instructions](https://aka.ms/vscode-instructions-docs)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Python Semantic Release](https://python-semantic-release.readthedocs.io/)
+
+## Reference Projects
+
+This repository serves as a reference for other projects:
+
+- **Default Community Health Files**: Automatically applied to all repositories under `allabur` account
+- **Reusable Workflows**: CI/CD workflows that can be referenced from other repositories
+- **AI Agent Standards**: Standardized instructions for GitHub Copilot and other AI assistants
+- **Python Best Practices**: Comprehensive guidelines for Python project development
+
+Projects using these standards benefit from:
+- Consistent code quality and testing practices
+- Automated versioning and release management
+- Standardized PR and issue workflows
+- AI-assisted development with context-aware suggestions
