@@ -1,6 +1,6 @@
 # Commit Guidelines
 
-This document establishes standards for commit messages in the git-flow-next project to ensure clear, consistent, and informative version history.
+This document establishes standards for commit messages to ensure clear, consistent, and informative version history across Python projects.
 
 ## Commit Message Format
 
@@ -99,7 +99,7 @@ Implements TestFinishWithConsecutiveConflicts which validates the system's abili
 ```
 docs: Update testing guidelines with default configuration details
 
-Adds comprehensive documentation about git-flow default branches and settings to help developers write consistent tests. Includes branch relationships, merge strategies, and examples of proper test setup using git-flow defaults rather than custom configurations.
+Adds comprehensive documentation about testing configuration and best practices to help developers write consistent tests. Includes fixture patterns, parametrization strategies, and examples of proper test setup using pytest conventions.
 ```
 
 ## Best Practices
