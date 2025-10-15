@@ -1,149 +1,227 @@
-# GitHub Copilot Instructions for git-flow-next
+# GitHub Copilot Instructions
 
-This document provides GitHub Copilot with essential context for working with git-flow-next. For comprehensive development information, refer to [CLAUDE.md](../CLAUDE.md) which contains complete architectural details, coding guidelines, and development commands.
+This document provides GitHub Copilot with essential context for working with Python projects following the standards in this repository.
 
 ## Quick Reference
 
-git-flow-next is a modern Go implementation of git-flow with these key characteristics:
+This `.github` repository defines standards for Python projects under the `allabur` account:
 
-- **Unified topic branch architecture** - Single command structure for all branch types
-- **Configuration-driven workflows** - Behavior defined via Git config  
-- **Three-layer configuration precedence** - Defaults → Git config → CLI flags (always win)
-- **Pragmatic development philosophy** - Anti-over-engineering, explicit over implicit
+- **Unified Python architecture** - Standard project structure with src/ layout
+- **Configuration-driven workflows** - Behavior defined via pyproject.toml
+- **Modern Python practices** - Python 3.10+, type hints, PEP 8, pytest
+- **Documentation-first philosophy** - NumPy-style docstrings, MkDocs/Sphinx
 
 ## Essential Patterns
 
 ### Development Commands
+
 ```bash
-# Building and testing (see CLAUDE.md for complete reference)
-go build -o git-flow main.go              # Build local binary
-go test ./...                             # Run all tests  
-./scripts/build.sh                        # Multi-platform build
+# Linting and formatting
+ruff check .                                  # Check for issues
+ruff check --fix .                           # Auto-fix issues
+
+# Type checking
+mypy --strict src/                           # Static type checking
+
+# Testing
+pytest                                       # Run all tests
+pytest --cov=mypackage --cov-report=html    # With coverage
+
+# Documentation
+mkdocs build --strict                        # Build documentation
+interrogate -v --fail-under=80 src/         # Check docstring coverage
 ```
 
-### Version Updates
-When updating version information, ensure both locations are updated:
-- `version/version.go` - Core version constant used by the application
-- `cmd/version.go` - Version variable used by the version command
+### Python Code Structure
 
-Both files must have matching version numbers to maintain consistency.
+```python
+# Type hints and docstrings pattern
+def calculate_total(
+    items: list[dict[str, float]],
+    tax_rate: float = 0.0,
+) -> float:
+    """Calculate total price including tax.
+    
+    Parameters
+    ----------
+    items : list[dict[str, float]]
+        List of items with 'price' key.
+    tax_rate : float, optional
+        Tax rate as decimal (e.g., 0.08 for 8%), by default 0.0.
+    
+    Returns
+    -------
+    float
+        Total price including tax.
+    
+    Examples
+    --------
+    >>> items = [{"price": 10.0}, {"price": 20.0}]
+    >>> calculate_total(items, 0.08)
+    32.4
+    """
+    subtotal = sum(item["price"] for item in items)
+    return subtotal * (1 + tax_rate)
 
-### Command Structure (Universal Pattern)
-```go
-// Layer 1: Cobra Command Handler
-RunE: func(cmd *cobra.Command, args []string) error {
-    // Parse flags, call command wrapper
-    CommandName(branchType, name, param1, param2)
-    return nil
-}
-
-// Layer 2: Command Wrapper - Handle errors and exit codes
-func CommandName(params...) {
-    if err := executeCommand(params...); err != nil {
-        // Convert to exit code and exit
-    }
-}
-
-// Layer 3: Execute Function - Business logic only
-func executeCommand(params...) error {
-    // Load config ONCE at start, pass to all functions
-    cfg, err := config.LoadConfig()
-    // Implementation logic
-    return nil
-}
-```
-
-### Configuration Loading Pattern
-```go
-// CRITICAL: Load once at start, pass everywhere
-cfg, err := config.LoadConfig()
-if err != nil {
-    return &errors.GitError{Operation: "load configuration", Err: err}
-}
-// Pass cfg to all helper functions
-```
-
-### Error Handling Pattern
-```go
-// Custom structured errors with exit codes
-if err := git.BranchExists(branchName); err != nil {
-    return &errors.BranchNotFoundError{BranchName: branchName}
-}
-
-// Git operation wrapping
-if err := git.Checkout(branchName); err != nil {
-    return &errors.GitError{
-        Operation: fmt.Sprintf("checkout branch '%s'", branchName),
-        Err:       err,
-    }
-}
+# Error handling pattern
+def process_file(path: str) -> dict:
+    """Process a JSON file and return its contents."""
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found: {path}")
+    
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in {path}: {e}") from e
 ```
 
 ## Key Files and Locations
 
-### Core Implementation
-- `cmd/` - All CLI commands using Cobra framework
-- `internal/config/` - Configuration management and branch definitions  
-- `internal/git/` - Git command wrappers with error handling
-- `internal/errors/` - Custom error types with exit codes
-- `internal/mergestate/` - Multi-step operation state persistence
-
 ### Documentation (Complete Reference)
-- **[CLAUDE.md](../CLAUDE.md)** - Complete development guide and architecture
-- **[ARCHITECTURE.md](../ARCHITECTURE.md)** - Technical architecture deep dive
-- **[CODING_GUIDELINES.md](../CODING_GUIDELINES.md)** - Detailed coding standards
-- **[CONFIGURATION.md](../CONFIGURATION.md)** - Configuration system reference
 
-### Testing
-- `test/` - Test files mirroring source structure
-- `testutil/` - Git repository helpers and test utilities
+- **[CLAUDE.md](CLAUDE.md)** - Complete development guide for Python projects
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Python project architecture patterns
+- **[CODING_GUIDELINES.md](CODING_GUIDELINES.md)** - Python coding standards (PEP 8, type hints)
+- **[CONFIGURATION.md](CONFIGURATION.md)** - Configuration with pyproject.toml and .env files
+- **[TESTING_GUIDELINES.md](TESTING_GUIDELINES.md)** - Pytest testing practices
+- **[COMMIT_GUIDELINES.md](COMMIT_GUIDELINES.md)** - Conventional commits format
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution workflow
+
+### Python Project Structure
+
+```
+project/
+├── src/
+│   └── mypackage/           # Source code package
+│       ├── __init__.py
+│       ├── models/          # Data models
+│       ├── services/        # Business logic
+│       ├── api/             # API endpoints
+│       └── utils/           # Utilities
+├── tests/                   # Test suite
+│   ├── unit/               # Unit tests
+│   ├── integration/        # Integration tests
+│   └── conftest.py         # Pytest fixtures
+├── docs/                   # Documentation
+├── .github/
+│   └── workflows/          # CI/CD workflows
+├── pyproject.toml          # Configuration
+└── README.md
+```
 
 ## Mandatory Development Requirements
 
 When making changes, you **MUST always**:
 
-1. **Create/adjust tests** for new functionality
-2. **Run all tests**: `go test ./...`
-3. **Update relevant documentation** (.md files for user-facing changes)
+1. **Add type hints** to all function signatures (Python 3.10+)
+2. **Write NumPy-style docstrings** for public functions and classes
+3. **Create/update tests** using pytest (AAA pattern)
+4. **Run quality checks**: `ruff check .` and `mypy --strict src/`
+5. **Verify tests pass**: `pytest --cov=mypackage`
+6. **Update documentation** for user-facing changes
 
-## Branch Types and Configuration
+## Python Configuration
 
-### Base Branches (Long-living)
-```go
-// main (root branch)
-gitflow.branch.main.type=base
-gitflow.branch.main.parent=""
+### pyproject.toml Structure
 
-// develop (child of main, auto-updates)  
-gitflow.branch.develop.type=base
-gitflow.branch.develop.parent=main
-gitflow.branch.develop.autoUpdate=true
-```
+```toml
+[project]
+name = "myproject"
+version = "1.0.0"
+description = "My Python project"
+requires-python = ">=3.10"
 
-### Topic Branches (Short-living)  
-```go
-// feature branches
-gitflow.branch.feature.type=topic
-gitflow.branch.feature.parent=develop
-gitflow.branch.feature.prefix="feature/"
-gitflow.branch.feature.upstreamStrategy=merge
-gitflow.branch.feature.downstreamStrategy=rebase
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "I", "N", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["--cov=mypackage", "-v"]
 ```
 
 ## Critical Implementation Notes
 
-1. **Three-layer configuration**: Branch defaults → Git config → CLI flags (always win)
-2. **Load config once**: At command start, pass to all functions  
-3. **Use Git wrappers**: Never call git directly, use `internal/git` package
-4. **Structured errors**: Return specific error types with exit codes
-5. **State persistence**: Save state for multi-step operations that can be interrupted
+1. **Type hints everywhere**: Use Python 3.10+ syntax (`list[str]`, `dict[str, int]`, `X | None`)
+2. **NumPy docstrings**: All public APIs must have complete docstrings
+3. **AAA test pattern**: Arrange, Act, Assert structure for tests
+4. **Specific exceptions**: Use appropriate exception types with clear messages
+5. **PEP 8 compliance**: Follow naming conventions and style guide
+
+## Testing with Pytest
+
+### Test Structure
+
+```python
+# tests/test_calculator.py
+import pytest
+from mypackage.calculator import calculate_total
+
+def test_calculate_total_with_tax():
+    """Test total calculation with tax applied."""
+    # Arrange
+    items = [{"price": 10.0}, {"price": 20.0}]
+    tax_rate = 0.08
+    
+    # Act
+    result = calculate_total(items, tax_rate)
+    
+    # Assert
+    assert result == 32.4
+
+@pytest.mark.parametrize("items,tax_rate,expected", [
+    ([{"price": 10.0}], 0.0, 10.0),
+    ([{"price": 10.0}], 0.10, 11.0),
+    ([{"price": 10.0}, {"price": 20.0}], 0.08, 32.4),
+])
+def test_calculate_total_parametrized(items, tax_rate, expected):
+    """Test multiple scenarios with parametrization."""
+    result = calculate_total(items, tax_rate)
+    assert result == expected
+```
+
+### Fixtures
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def sample_items():
+    """Provide sample items for testing."""
+    return [
+        {"name": "Widget", "price": 10.0},
+        {"name": "Gadget", "price": 20.0},
+    ]
+
+def test_with_fixture(sample_items):
+    """Test using fixture data."""
+    result = calculate_total(sample_items)
+    assert result == 30.0
+```
 
 ## Integration Points
 
-- **git-flow-avh compatibility** - Import existing configurations
-- **Tower integration** - Git Tower GUI uses same config system
-- **CI/CD pipelines** - Webhook-triggered deployments based on branch patterns
+- **GitHub Actions**: CI/CD workflows in `.github/workflows/`
+- **Python Semantic Release**: Automated versioning from commit messages
+- **MkDocs/Sphinx**: Documentation generation from docstrings
+- **pytest-cov**: Code coverage reporting
 
 ---
 
-**For complete architectural details, coding guidelines, testing practices, and configuration examples, see [CLAUDE.md](../CLAUDE.md)**
+**For complete details, see [CLAUDE.md](CLAUDE.md)** which contains the full development guide.

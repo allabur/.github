@@ -1,180 +1,110 @@
-# git-flow-next
+# .github Repository Guidelines
 
-A modern, maintainable implementation of the git-flow branching model, written in Go.
+Comprehensive documentation for Python projects following the standards defined in this repository.
 
 ## About
 
-git-flow-next is a modern reimplementation of the popular git-flow branching model. It's built with Go, focusing on reliability, extensibility, and developer experience.
+This repository provides default community health files, AI agent instructions, and reusable workflows for all repositories under the `allabur` account. The guidelines in this folder establish standards for Python project development, testing, documentation, and collaboration.
 
-## Why This Project?
+## Documentation Files
 
-This project is maintained by the team behind [Tower](https://www.git-tower.com), one of the most popular Git clients for Mac and Windows. Having integrated git-flow into Tower over many years, we've gained deep insights into its strengths and areas for improvement.
+### Core Guidelines
 
-As developers of version control tools, we're passionate about creating better developer experiences. While the original git-flow has served the community well, we saw an opportunity to build a more modern implementation that:
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Python project architecture patterns, structure conventions, and design patterns
+- **[CODING_GUIDELINES.md](CODING_GUIDELINES.md)** - Python coding standards, PEP 8 compliance, type hints, and code quality
+- **[TESTING_GUIDELINES.md](TESTING_GUIDELINES.md)** - Pytest testing methodology, coverage goals, and best practices
+- **[CONFIGURATION.md](CONFIGURATION.md)** - Configuration management with pyproject.toml, environment variables, and tool configs
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines, development setup, and pull request workflow
+- **[COMMIT_GUIDELINES.md](COMMIT_GUIDELINES.md)** - Commit message standards using conventional commits
 
-- Is written in Go for better maintainability and performance
-- Provides a more robust and reliable experience
-- Offers better error handling and conflict resolution
-- Supports modern Git workflows and practices
-- Maintains compatibility with existing git-flow setups
+### AI Assistant Context
 
-Our goal is to contribute back to the developer community with tools that make version control workflows more efficient and enjoyable.
+- **[CLAUDE.md](CLAUDE.md)** - Guidance for Claude Code when working with Python projects
+- **[copilot-instructions.md](copilot-instructions.md)** - GitHub Copilot context specific to this repository
 
-## Features
+## Quick Reference
 
-- **Modern Implementation**: Written in Go with focus on reliability and maintainability
-- **Improved Conflict Resolution**: Better handling of merge conflicts and edge cases
-- **Flexible Configuration**: Customizable branch naming and merge strategies
-- **Compatibility**: Works with existing git-flow repositories
-- **Enhanced Error Handling**: Clear error messages and recovery options
-- **Performance**: Fast and efficient operations
+### Project Structure
 
-## Installation
+Python projects following these guidelines use:
 
-### Homebrew (macOS and Linux)
-
-```bash
-brew install gittower/tap/git-flow-next
+```
+project/
+├── src/
+│   └── mypackage/           # Source code
+├── tests/                   # Test suite
+├── docs/                    # Documentation
+├── .github/
+│   └── workflows/           # CI/CD workflows
+├── pyproject.toml           # Project configuration
+└── README.md
 ```
 
-### Manual Installation
+### Development Workflow
 
-1. Download the latest release from the [releases page](https://github.com/gittower/git-flow-next/releases)
-2. Extract the binary to a location in your PATH
-3. Make it executable: `chmod +x /path/to/git-flow`
+1. **Fork and Clone**: Fork the repository, clone your fork
+2. **Create Branch**: `git checkout -b feature/your-feature`
+3. **Make Changes**: Write code following PEP 8 and type hints
+4. **Write Tests**: Add tests with pytest (AAA pattern)
+5. **Check Quality**: Run ruff, mypy, and pytest
+6. **Commit**: Use conventional commits format
+7. **Submit PR**: Create pull request with clear description
 
-## Quick Start
-
-1. Initialize git-flow in your repository:
-   ```bash
-   git flow init
-   ```
-
-2. Start a new feature:
-   ```bash
-   git flow feature start my-feature
-   ```
-
-3. Finish the feature:
-   ```bash
-   git flow feature finish my-feature
-   ```
-
-## Shorthand Commands
-
-git-flow-next provides convenient shorthand commands that automatically detect your current topic branch and execute the appropriate action. These aliases work similar to git-flow-avh and eliminate the need to specify the branch type manually.
-
-### Available Shorthands
-
-| Shorthand | Full Command | Description |
-|-----------|--------------|-------------|
-| `git flow delete` | `git flow <type> delete <name>` | Delete the current topic branch |
-| `git flow rebase` | `git flow <type> update --rebase` | Rebase the current topic branch |
-| `git flow update` | `git flow <type> update` | Update the current topic branch |
-| `git flow rename` | `git flow <type> rename <name>` | Rename the current topic branch |
-| `git flow publish` | `git flow <type> publish` | Publish the current topic branch *(planned)* |
-| `git flow finish` | `git flow <type> finish` | Finish the current topic branch |
-
-### How It Works
-
-When you use a shorthand command, git-flow-next:
-
-1. **Detects your current branch** - Checks which branch you're currently on
-2. **Identifies the branch type** - Determines if it's a feature, release, hotfix, or support branch based on configured prefixes
-3. **Executes the full command** - Runs the corresponding full command with the detected type and branch name
-
-### Examples
+### Common Commands
 
 ```bash
-# On a feature branch
-git checkout feature/my-awesome-feature
-git flow finish  # Executes: git flow feature finish my-awesome-feature
-git flow rebase  # Executes: git flow feature update --rebase
+# Linting and type checking
+ruff check .
+mypy --strict src/
 
-# On a release branch  
-git checkout release/v1.2.0
-git flow publish  # Executes: git flow release publish v1.2.0
+# Testing with coverage
+pytest --cov=mypackage --cov-report=html
 
-# On a hotfix branch
-git checkout hotfix/critical-bug
-git flow finish  # Executes: git flow hotfix finish critical-bug
-git flow rebase  # Executes: git flow hotfix update --rebase
+# Documentation
+mkdocs build --strict
+interrogate -v --fail-under=80 src/
 ```
 
-### Branch Detection
+## Integration
 
-The shorthand commands automatically detect topic branches based on your git-flow configuration:
+These guidelines integrate with:
 
-- **Feature branches**: `feature/`, `features/`, `feat/`
-- **Release branches**: `release/`, `releases/`, `rel/`
-- **Hotfix branches**: `hotfix/`, `hotfixes/`, `hf/`
-- **Support branches**: `support/`, `supports/`, `sup/`
+- **Instructions**: Modular AI agent instructions in `/instructions/`
+- **Workflows**: Reusable CI/CD workflows in `/workflows/`
+- **Templates**: Issue and PR templates in `/ISSUE_TEMPLATE/` and root
+- **Health Files**: CODEOWNERS, labels, and contribution standards
 
-### Error Handling
+## Python Best Practices
 
-- **Non-topic branches**: If you're not on a topic branch, you'll get a clear error message
-- **Ambiguous branches**: If a branch name could be interpreted multiple ways, you'll be prompted to use the explicit command
-- **Missing branches**: If the branch doesn't exist, appropriate error messages are shown
+### Code Quality
 
-### Command Options
+- **PEP 8 Compliance**: Follow Python style guide strictly
+- **Type Hints**: Use Python 3.10+ type hints on all functions
+- **Docstrings**: NumPy-style docstrings for all public APIs
+- **Error Handling**: Use specific exceptions with clear messages
+- **Testing**: Minimum 60% coverage, targeting 75-90%
 
-All options and flags are passed through to the underlying commands:
+### Tools and Linters
 
-```bash
-# Options work exactly like the full commands
-git flow finish --keep --tag  # Keeps the branch and creates a tag
-git flow update --rebase      # Forces rebase strategy for update
-git flow delete --force       # Force deletes the branch
-```
+- **ruff**: Fast Python linter and formatter
+- **mypy**: Static type checker for Python
+- **pytest**: Testing framework with fixtures and parametrization
+- **interrogate**: Docstring coverage checker
+- **MkDocs**: Documentation generator
 
-### Supported Branch Types
+## Resources
 
-The shorthand commands work with all standard git-flow branch types:
+- [PEP 8 - Style Guide for Python Code](https://peps.python.org/pep-0008/)
+- [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
+- [NumPy Docstring Guide](https://numpydoc.readthedocs.io/en/latest/format.html)
+- [pytest Documentation](https://docs.pytest.org/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Python Semantic Release](https://python-semantic-release.readthedocs.io/)
 
-- **Feature branches**: For new features and enhancements
-- **Release branches**: For preparing new releases
-- **Hotfix branches**: For critical bug fixes
-- **Support branches**: For maintaining older versions
+## Related Repositories
 
-### Planned Features
+This is a **default `.github` repository**. For project-specific documentation:
 
-Some shorthand commands are currently planned for future releases:
-
-- **`git flow publish`**: Will be implemented as an alias to `git flow <type> publish`
-
-These commands currently show "not implemented" messages when used.
-
-## Documentation
-
-For detailed documentation, please visit our [documentation site](https://git-flow.sh/docs/).
-
-### Configuration Reference
-
-For comprehensive configuration information, see **[CONFIGURATION.md](CONFIGURATION.md)** which includes:
-- Complete list of all configuration options
-- Default values and examples
-- Configuration precedence hierarchy
-- Migration guide from git-flow-avh
-- Best practices and workflows
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get involved.
-
-## Development
-
-For information about the project's architecture and technical overview, see [ARCHITECTURE.md](ARCHITECTURE.md).
-
-## License
-
-This project is licensed under the BSD 2-Clause License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-This project builds upon the work of:
-- Vincent Driessen's [original git-flow](https://nvie.com/posts/a-successful-git-branching-model/)
-- Peter van der Does' [git-flow (AVH Edition)](https://github.com/petervanderdoes/gitflow-avh)
-
-## About Tower
-
-git-flow-next is maintained by the team behind [Tower](https://www.git-tower.com), the popular Git client for Mac and Windows. With over a decade of experience in Git tooling and version control, we're committed to creating high-quality developer tools that make working with Git more efficient and enjoyable.
+- Check individual repository's `.github/` folder for overrides
+- Reference these guidelines as defaults when repo-specific docs don't exist
+- Extend rather than replace these standards in project-specific docs
