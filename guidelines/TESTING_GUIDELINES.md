@@ -1,537 +1,495 @@
 # Testing Guidelines
 
-This document outlines the testing conventions and patterns used in the git-flow-next project.
+This document outlines testing conventions and patterns for Python projects using pytest.
 
-## Test Function Naming
+## Core Principles
 
-Follow descriptive naming patterns that clearly indicate what is being tested:
+When writing tests:
 
-```go
-// Basic functionality
-func TestStartFeatureBranch(t *testing.T)
-func TestFinishFeatureBranch(t *testing.T)
-func TestInitWithDefaults(t *testing.T)
+- **Start simple**: Write basic tests first, increase complexity gradually
+- **Test what matters**: Focus on critical functionality and edge cases
+- **Keep tests readable**: Tests should be easy to understand and maintain
+- **Run tests often**: Catch issues early in development
 
-// Configuration-specific tests
-func TestStartWithCustomConfig(t *testing.T)
-func TestInitWithAVHConfig(t *testing.T)
+## Test Framework
 
-// Error conditions
-func TestUpdateWithMergeConflict(t *testing.T)
-func TestFinishWithMergeConflict(t *testing.T)
-func TestDeleteNonExistentRemoteBranch(t *testing.T)
+### Pytest Basics
 
-// Feature-specific tests
-func TestFinishFeatureBranchWithFetchFlag(t *testing.T)
-func TestStartWithFetchFlag(t *testing.T)
+- **Framework**: Use **pytest** as the testing framework
+- **File naming**: Name test files `test_*.py` or `*_test.py`
+- **Location**: Place tests in a `tests/` directory at project root
+- **Function naming**: Use descriptive names following the pattern:
+  - `test_function_name_condition_expected_result()`
+  - Examples: `test_calculate_total_with_discount_returns_reduced_price()`
+  - Or simpler: `test_user_can_login()`, `test_divide_by_zero_raises_error()`
+- **Avoid generic names**: Don't use `test_function()` or `test_1()`
+
+### Test Structure
+
+Organize tests to mirror your source code structure in flat organization:
+
+```
+project/
+├── src/
+│   └── mypackage/
+│       ├── __init__.py
+│       ├── calculator.py
+│       └── utils.py
+└── tests/
+    ├── __init__.py
+    ├── test_calculator.py
+    └── test_utils.py
 ```
 
-## Test Comments and State Documentation
+When to use alternatives:
 
-**REQUIRED**: Every test function must have a structured comment that follows this exact pattern:
+- Mirrored (subdirectories): Only when src/ has multiple levels of subdirectories
+- By type (unit/integration): Only for large projects with many types of tests
 
-1. **First line**: Brief description of what the test validates
-2. **Steps:** section with numbered list of test actions
-3. **Expected outcomes** embedded in the steps
+### AAA Pattern
 
-### Comment Pattern (MANDATORY)
+Use the **AAA pattern** for clear, readable tests:
 
-```go
-// TestFinishWithMergeConflict tests the behavior when finishing a branch with merge conflicts.
-// Steps:
-// 1. Sets up a test repository and initializes git-flow
-// 2. Creates a feature branch
-// 3. Adds conflicting changes to both feature and develop branches
-// 4. Attempts to finish the feature branch
-// 5. Verifies the operation fails with merge conflict
-func TestFinishWithMergeConflict(t *testing.T) {
-    // Test implementation...
-}
+- **Arrange**: Set up test data and preconditions
+- **Act**: Execute the code being tested
+- **Assert**: Verify the results
+
+```python
+def test_calculate_discount():
+    # Arrange
+    original_price = 100
+    discount_percent = 20
+
+    # Act
+    final_price = calculate_discount(original_price, discount_percent)
+
+    # Assert
+    assert final_price == 80
 ```
 
-### Additional Comment Guidelines
+## Coverage Goals
 
-- **Be specific**: Include exact branch names, commands, and expected results
-- **Number all steps**: Use sequential numbering (1, 2, 3...)  
-- **Include verification**: Always specify what is being verified
-- **Use active voice**: "Creates a branch" not "A branch is created"
-- **Match test structure**: Comments should reflect actual test implementation
+### Progressive Targets
 
-### Examples of Good Test Comments
+Start with achievable goals and improve over time:
 
-```go
-// TestConfigAddBase tests adding base branch configurations.
-// Steps:
-// 1. Sets up a test repository and initializes git-flow
-// 2. Adds various base branches with different configurations  
-// 3. Verifies branches are created and configuration is saved correctly
-// 4. Tests error conditions like duplicate branches and invalid parents
-func TestConfigAddBase(t *testing.T) { ... }
+- **Beginner**: Aim for **≥ 60% coverage** initially
+- **Intermediate**: Work toward **≥ 75% coverage** as you gain confidence
+- **Advanced**: Target **≥ 90% coverage** for production code
 
-// TestStartFeatureBranch tests the start command for feature branches.
-// Steps:
-// 1. Sets up a test repository and initializes git-flow with defaults
-// 2. Runs 'git flow feature start my-feature'
-// 3. Verifies feature/my-feature branch is created
-// 4. Verifies branch is based on develop branch
-func TestStartFeatureBranch(t *testing.T) { ... }
+### Measuring Coverage
+
+Use `pytest-cov` to track coverage:
+
+```bash
+# Run tests with coverage report
+pytest --cov=mypackage
+
+# Generate HTML report for detailed view
+pytest --cov=mypackage --cov-report=html
 ```
 
-## One Test Case Per Function Rule
+**Focus on**:
 
-**CRITICAL**: Each test function must test exactly one scenario or behavior. Never use table-driven tests with multiple test cases in a single function.
+- Critical business logic
+- Edge cases and error conditions
+- Public APIs and interfaces
 
-### ❌ BAD: Multiple Test Cases in One Function
+**Don't worry about**:
 
-```go
-func TestMergeStrategyConfigHierarchy(t *testing.T) {
-    testCases := []struct {
-        name           string
-        branchConfig   string
-        commandConfig  string
-        flag           string
-        expectedResult string
-    }{
-        {"branch_default_merge", "merge", "", "", "merge"},
-        {"command_overrides_branch", "merge", "rebase=true", "", "rebase"},
-        {"flag_overrides_config", "merge", "rebase=true", "--no-rebase", "merge"},
+- 100% coverage (diminishing returns)
+- Trivial getters/setters
+- Third-party library code
+
+## Test Types
+
+### Unit Tests
+
+Test individual functions or methods in isolation:
+
+```python
+def test_add_two_numbers():
+    result = calculator.add(2, 3)
+    assert result == 5
+
+def test_divide_by_zero_raises_error():
+    with pytest.raises(ZeroDivisionError):
+        calculator.divide(10, 0)
+```
+
+**Characteristics**:
+
+- Fast execution (milliseconds)
+- No external dependencies
+- Test one thing at a time
+
+### Integration Tests
+
+Test how components work together:
+
+```python
+def test_user_registration_workflow():
+    user = create_user("test@example.com", "password123")
+    assert user.is_active
+    assert user.email == "test@example.com"
+```
+
+**Characteristics**:
+
+- May involve multiple modules
+- Can use database or file system
+- Slower than unit tests
+
+### Regression Tests
+
+When fixing a bug, add a test to prevent it from returning:
+
+```python
+def test_issue_123_negative_price_handling():
+    """Regression test for bug #123: negative prices caused crash"""
+    result = calculate_total(items=[{"price": -10}])
+    assert result == 0  # Should handle gracefully
+```
+
+## Fixtures and Test Data
+
+Use **fixtures** to set up common test resources:
+
+```python
+import pytest
+
+@pytest.fixture
+def sample_user():
+    """Provide a test user for multiple tests"""
+    return User(name="Test User", email="test@example.com")
+
+def test_user_name(sample_user):
+    assert sample_user.name == "Test User"
+
+def test_user_email(sample_user):
+    assert sample_user.email == "test@example.com"
+```
+
+### Test Data Best Practices
+
+**Factory Functions**: Create reusable test data generators:
+
+```python
+def create_test_user(name="Test User", email="test@example.com", active=True):
+    """Factory function for creating test users"""
+    return User(name=name, email=email, is_active=active)
+
+def test_user_creation():
+    user = create_test_user(name="Alice")
+    assert user.name == "Alice"
+```
+
+**Constants**: Define commonly used test values:
+
+```python
+# test_constants.py
+VALID_EMAIL = "test@example.com"
+INVALID_EMAIL = "not-an-email"
+TEST_PASSWORD = "SecurePass123!"
+EMPTY_STRING = ""
+MAX_USERNAME_LENGTH = 50
+
+def test_email_validation():
+    assert validate_email(VALID_EMAIL) is True
+    assert validate_email(INVALID_EMAIL) is False
+```
+
+**Realistic Data**: Keep test data simple but realistic:
+
+```python
+def test_order_calculation():
+    # Simple but realistic order data
+    order = {
+        "items": [
+            {"name": "Widget", "price": 10.00, "quantity": 2},
+            {"name": "Gadget", "price": 15.50, "quantity": 1}
+        ],
+        "tax_rate": 0.08
     }
-    
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            // Test implementation...
-        })
-    }
-}
+    total = calculate_order_total(order)
+    assert total == 38.34  # (20 + 15.50) * 1.08
 ```
 
-### ✅ GOOD: One Test Case Per Function
+### Parametrized Tests
 
-```go
-// TestMergeStrategyBranchDefault tests that branch default strategy is used.
-// Steps:
-// 1. Sets up repository with branch configured for merge strategy
-// 2. Runs finish command without overrides
-// 3. Verifies merge strategy was used
-func TestMergeStrategyBranchDefault(t *testing.T) {
-    // Single test scenario implementation...
-}
+Test multiple inputs efficiently:
 
-// TestMergeStrategyCommandConfigOverride tests command config overriding branch default.
-// Steps:
-// 1. Sets up repository with branch configured for merge strategy
-// 2. Sets gitflow.feature.finish.rebase=true in config
-// 3. Runs finish command without flags
-// 4. Verifies rebase strategy was used instead of merge
-func TestMergeStrategyCommandConfigOverride(t *testing.T) {
-    // Single test scenario implementation...
-}
-
-// TestMergeStrategyFlagOverridesConfig tests command flag overriding config.
-// Steps:
-// 1. Sets up repository with rebase configured via command config
-// 2. Runs finish command with --no-rebase flag
-// 3. Verifies merge strategy was used instead of rebase
-func TestMergeStrategyFlagOverridesConfig(t *testing.T) {
-    // Single test scenario implementation...
-}
+```python
+@pytest.mark.parametrize("input,expected", [
+    (2, 4),
+    (3, 9),
+    (5, 25),
+    (-2, 4),
+])
+def test_square_numbers(input, expected):
+    assert square(input) == expected
 ```
 
-### Why One Test Case Per Function?
+## Assertions Best Practices
 
-1. **Clear failure identification** - When a test fails, you immediately know which specific scenario failed
-2. **Focused debugging** - Each test tests one thing, making debugging straightforward
-3. **Maintainable test suite** - Easy to modify, disable, or extend individual test scenarios
-4. **Better test names** - Function names clearly describe what is being tested
-5. **Proper test isolation** - Each test sets up exactly what it needs, nothing more
-6. **Follows git-flow-next philosophy** - Explicit and readable over clever and compact
+### Use Specific Assertions
 
-### Exception: Helper Functions
+**DO**: Use multiple specific assertions that clearly indicate what failed:
 
-Table-driven tests are acceptable in helper functions that test pure functions with multiple input/output combinations:
+```python
+def test_user_registration():
+    user = register_user("alice@example.com", "password123")
 
-```go
-func TestValidateBranchName(t *testing.T) {
-    // This is acceptable for pure validation functions
-    testCases := []struct {
-        name    string
-        input   string
-        isValid bool
-    }{
-        {"valid_name", "feature-branch", true},
-        {"invalid_spaces", "feature branch", false},
-        {"invalid_colon", "feature:branch", false},
-    }
-    
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            result := util.ValidateBranchName(tc.input)
-            assert.Equal(t, tc.isValid, result == nil)
-        })
-    }
-}
+    # Multiple specific assertions
+    assert user is not None
+    assert user.email == "alice@example.com"
+    assert user.is_active is True
+    assert user.created_at is not None
 ```
 
-**Rule**: Only use table-driven tests for testing pure functions with simple input/output validation, never for complex integration scenarios.
+**DON'T**: Use one complex assertion:
 
-## Temporary Git Repository Testing
+```python
+def test_user_registration():
+    user = register_user("alice@example.com", "password123")
 
-All tests use temporary Git repositories created through test utilities.
-
-### Default Branch Configuration
-
-When using `git flow init --defaults`, the following branches and settings are configured:
-
-#### Base Branches
-- **main**: Production branch (root branch)
-- **develop**: Integration branch (auto-updates from main)
-
-#### Topic Branch Types  
-- **feature**: Prefix `feature/`, parent `develop`, starts from `develop`
-- **release**: Prefix `release/`, parent `main`, starts from `develop` 
-- **hotfix**: Prefix `hotfix/`, parent `main`, starts from `main`
-
-#### Default Merge Strategies
-- **Feature finish**: `merge` into `develop`
-- **Release finish**: `merge` into `main` (then auto-update `develop`)
-- **Hotfix finish**: `merge` into `main` (then auto-update `develop`)
-- **Feature update**: `rebase` from `develop`
-- **Release update**: `merge` from `main`
-- **Hotfix update**: `rebase` from `main`
-
-#### Default Tag Settings
-- **Feature**: No tags created
-- **Release**: Tags created on finish
-- **Hotfix**: Tags created on finish
-
-### Testing with Default Configuration
-
-- **Use git-flow defaults by default**: Initialize repositories with `git flow init --defaults`
-- **Use feature branches for topic branch testing**: Feature branches are the most common topic branch type and should be used for general topic branch functionality tests
-- **Only create standalone branches when required**: If your test specifically needs a non-git-flow branch or custom configuration, create it explicitly
-- **Adjust configuration when needed**: Use `git config` commands to modify behavior for specific test scenarios
-
-```go
-// Standard test setup - use this for most tests
-func TestExample(t *testing.T) {
-    dir := testutil.SetupTestRepo(t)
-    defer testutil.CleanupTestRepo(t, dir)
-    
-    // Initialize with defaults - creates main, develop, and configures feature/release/hotfix
-    output, err := testutil.RunGitFlow(t, dir, "init", "--defaults")
-    if err != nil {
-        t.Fatalf("Failed to initialize git-flow: %v\nOutput: %s", err, output)
-    }
-    
-    // Use feature branches for topic branch testing
-    output, err = testutil.RunGitFlow(t, dir, "feature", "start", "test-branch")
-    // ... test implementation
-}
-
-// Example: Testing with modified merge strategy
-func TestFeatureFinishWithRebase(t *testing.T) {
-    dir := testutil.SetupTestRepo(t)
-    defer testutil.CleanupTestRepo(t, dir)
-    
-    // Initialize with defaults
-    output, err := testutil.RunGitFlow(t, dir, "init", "--defaults")
-    if err != nil {
-        t.Fatalf("Failed to initialize git-flow: %v", err)
-    }
-    
-    // Modify merge strategy for this test
-    _, err = testutil.RunGit(t, dir, "config", "gitflow.feature.finish.merge", "rebase")
-    if err != nil {
-        t.Fatalf("Failed to configure rebase strategy: %v", err)
-    }
-    
-    // Now test with the modified configuration
-    output, err = testutil.RunGitFlow(t, dir, "feature", "start", "rebase-test")
-    // ... test implementation
-}
+    # Avoid: Hard to debug when it fails
+    assert user and user.email == "alice@example.com" and user.is_active
 ```
 
-### Basic Test Setup
+### Test Both Positive and Negative Cases
 
-```go
-func TestExample(t *testing.T) {
-    // Setup temporary repository
-    dir := testutil.SetupTestRepo(t)
-    defer testutil.CleanupTestRepo(t, dir)
-    
-    // Initialize git-flow with defaults
-    output, err := testutil.RunGitFlow(t, dir, "init", "--defaults")
-    if err != nil {
-        t.Fatalf("Failed to initialize git-flow: %v\nOutput: %s", err, output)
-    }
-    
-    // Test implementation...
-}
+```python
+def test_email_validation_positive():
+    """Test valid email addresses"""
+    assert validate_email("user@example.com") is True
+    assert validate_email("name+tag@domain.co.uk") is True
+
+def test_email_validation_negative():
+    """Test invalid email addresses"""
+    assert validate_email("not-an-email") is False
+    assert validate_email("@example.com") is False
+    assert validate_email("user@") is False
 ```
 
-### Git Test Helper Functions
+### Use Custom Error Messages
 
-Available in `test/testutil/git.go`:
-
-- `SetupTestRepo(t *testing.T) string` - Creates temporary Git repository
-- `CleanupTestRepo(t *testing.T, dir string)` - Removes temporary repository
-- `RunGit(t *testing.T, dir string, args ...string)` - Executes Git commands
-- `RunGitFlow(t *testing.T, dir string, args ...string)` - Executes git-flow commands
-- `WriteFile(t *testing.T, dir string, name string, content string)` - Creates files
-- `BranchExists(t *testing.T, dir string, branch string) bool` - Checks branch existence
-- `GetCurrentBranch(t *testing.T, dir string) string` - Gets current branch name
-
-## Creating Git Scenarios for Tests
-
-### Merge and Rebase Conflicts
-
-To create merge/rebase conflicts for testing, **sequence matters**:
-
-#### ✅ Correct Sequence for Conflict Generation
-
-1. **Create branches BEFORE adding conflicting content**:
-   - Start with clean base branch
-   - Create topic branch from clean base
-   - Add content to topic branch first
-   - Switch back to base branch and add different content to same file
-   - Attempting to merge/rebase will create conflict
-
-```go
-// CORRECT: Create branch first, then add conflicting content
-output, err := testutil.RunGitFlow(t, dir, "feature", "start", "conflict-test")
-if err != nil {
-    t.Fatalf("Failed to create feature branch: %v", err)
-}
-
-// Add content to feature branch
-testutil.WriteFile(t, dir, "test.txt", "feature content")
-_, err = testutil.RunGit(t, dir, "add", "test.txt")
-_, err = testutil.RunGit(t, dir, "commit", "-m", "Add test.txt in feature")
-
-// Switch to base branch and add conflicting content
-_, err = testutil.RunGit(t, dir, "checkout", "develop")
-testutil.WriteFile(t, dir, "test.txt", "develop content")
-_, err = testutil.RunGit(t, dir, "add", "test.txt")
-_, err = testutil.RunGit(t, dir, "commit", "-m", "Add test.txt in develop")
-
-// Now finish will create conflict
-output, err = testutil.RunGitFlow(t, dir, "feature", "finish", "conflict-test")
+```python
+def test_price_calculation():
+    result = calculate_price(quantity=5, unit_price=10.0)
+    assert result == 50.0, f"Expected 50.0 but got {result}"
 ```
 
-#### ❌ Incorrect Sequence (Won't Create Conflicts)
+## Test Reliability
 
-```go
-// WRONG: Adding file to base first, then branching
-testutil.WriteFile(t, dir, "test.txt", "develop content")
-_, err = testutil.RunGit(t, dir, "add", "test.txt")
-_, err = testutil.RunGit(t, dir, "commit", "-m", "Add test.txt in develop")
+### Deterministic Tests
 
-// Branch inherits the file - no conflict will occur
-output, err := testutil.RunGitFlow(t, dir, "feature", "start", "conflict-test")
-testutil.WriteFile(t, dir, "test.txt", "feature content") // Modifying existing file
+- **Set random seeds** if using randomness: `random.seed(42)`
+- **Avoid time dependencies**: Use fixed dates or mock `datetime.now()`
+- **Don't depend on external services**: Mock HTTP calls, databases, etc.
+- **Clean up after tests**: Remove temp files, reset state
+
+### Handling Flaky Tests
+
+If a test fails occasionally:
+
+1. **Investigate immediately** - don't ignore it
+2. **Check for race conditions** or timing issues
+3. **Add proper waits** or synchronization
+4. **Consider using mocks** for external dependencies
+
+## Performance Tests
+
+When testing performance-critical code:
+
+### Include Performance Benchmarks
+
+```python
+import time
+
+def test_data_processing_performance():
+    """Test that data processing completes within reasonable time"""
+    large_dataset = generate_test_data(size=10000)
+
+    start_time = time.time()
+    result = process_data(large_dataset)
+    elapsed_time = time.time() - start_time
+
+    assert elapsed_time < 1.0, f"Processing took {elapsed_time:.2f}s, expected < 1.0s"
+    assert len(result) == 10000
 ```
 
-### Verifying Git Conflict States
+### Test with Realistic Data Volumes
 
-Different Git operations create different internal states that require specific verification:
+```python
+def test_bulk_import_performance():
+    """Test bulk import with realistic data volume"""
+    # Test with production-like data size
+    records = [create_test_record(i) for i in range(1000)]
 
-#### Rebase Conflict Verification
+    start = time.perf_counter()
+    imported_count = bulk_import(records)
+    duration = time.perf_counter() - start
 
-During rebase conflicts, standard Git commands show misleading information:
-
-```go
-// ❌ WRONG: Current branch shows "HEAD" during rebase conflict
-currentBranch := testutil.GetCurrentBranch(t, dir) // Returns "HEAD"
-if currentBranch != "feature/branch-name" { // This will always fail
-    t.Error("Not on expected branch")
-}
-
-// ✅ CORRECT: Check rebase state via Git internal files
-rebaseMergeDir := filepath.Join(dir, ".git", "rebase-merge")
-if _, err := os.Stat(rebaseMergeDir); os.IsNotExist(err) {
-    t.Error("Expected to be in rebase conflict state")
-}
-
-// Verify which branch is being rebased
-headNameFile := filepath.Join(rebaseMergeDir, "head-name")
-if headNameBytes, err := os.ReadFile(headNameFile); err != nil {
-    t.Errorf("Failed to read head-name file: %v", err)
-} else {
-    headName := strings.TrimSpace(string(headNameBytes))
-    expectedBranch := "refs/heads/feature/branch-name" // Full ref path
-    if headName != expectedBranch {
-        t.Errorf("Expected rebasing %s, got %s", expectedBranch, headName)
-    }
-}
+    assert imported_count == 1000
+    assert duration < 5.0, f"Bulk import took {duration:.2f}s"
 ```
 
-#### Merge Conflict Verification
+### Monitor Memory Usage
 
-```go
-// Check for merge conflict state
-if _, err := os.Stat(filepath.Join(dir, ".git", "MERGE_HEAD")); os.IsNotExist(err) {
-    t.Error("Expected to be in merge conflict state")
-}
+```python
+import tracemalloc
+
+def test_memory_efficient_processing():
+    """Ensure processing doesn't exceed memory limits"""
+    tracemalloc.start()
+
+    # Process large dataset
+    result = process_large_file("test_data.csv")
+
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    # Peak memory should be under 100MB
+    assert peak < 100 * 1024 * 1024, f"Peak memory usage: {peak / 1024 / 1024:.2f}MB"
 ```
 
-### Multiple Rebase Conflicts
+### Set Reasonable Performance Thresholds
 
-For testing complex rebase scenarios:
-- Repeat the conflict generation pattern with additional commits and files
-- Each conflicting commit will create a separate rebase step that requires resolution
+```python
+@pytest.mark.benchmark
+def test_search_performance():
+    """Search should complete in under 100ms for 1000 items"""
+    items = [f"item_{i}" for i in range(1000)]
 
-### Using Remotes
+    start = time.perf_counter()
+    result = search_items(items, "item_500")
+    elapsed = (time.perf_counter() - start) * 1000  # Convert to ms
 
-To test remote functionality:
-
-1. **Create Bare Remote Repository**:
-   - Use `testutil.AddRemote()` to create a local bare repository
-   - Add it as a remote using the file path
-   - Push branches to establish tracking
-
-```go
-// Add a remote repository
-remoteDir, err := testutil.AddRemote(t, dir, "origin", true)
-if err != nil {
-    t.Fatalf("Failed to add remote: %v", err)
-}
-defer testutil.CleanupTestRepo(t, remoteDir)
-
-// Create feature branch and make changes
-output, err = testutil.RunGitFlow(t, dir, "feature", "start", "fetch-test")
-testutil.WriteFile(t, dir, "feature.txt", "feature content")
-_, err = testutil.RunGit(t, dir, "add", "feature.txt")
-_, err = testutil.RunGit(t, dir, "commit", "-m", "Add feature file")
-
-// Test operations with remote (fetch, push, etc.)
-output, err = testutil.RunGitFlow(t, dir, "feature", "finish", "fetch-test", "--fetch")
+    assert result == "item_500"
+    assert elapsed < 100, f"Search took {elapsed:.2f}ms"
 ```
 
-## Test Organization
+## Running Tests
 
-### Directory Structure
+### Development Workflow
 
+```bash
+# Run all tests
+pytest
+
+# Run specific test file
+pytest tests/test_calculator.py
+
+# Run specific test function
+pytest tests/test_calculator.py::test_add_two_numbers
+
+# Stop on first failure (useful for debugging)
+pytest -x
+
+# Run only failed tests from last run
+pytest --lf
+
+# Show print statements (useful for debugging)
+pytest -s
 ```
-test/
-├── cmd/              # Command-level integration tests
-├── internal/         # Internal package unit tests
-└── testutil/         # Test utilities and helpers
+
+### Warnings Configuration
+
+**For beginners** (less strict, focus on learning):
+
+```bash
+# Show warnings but don't fail
+pytest
+
+# Show summary of warnings at the end
+pytest -rw
 ```
 
-### Error Handling in Tests
+**As you progress** (more strict):
 
-Always include comprehensive error checking with detailed failure messages:
+```bash
+# Show detailed warnings
+pytest -W default
 
-```go
-output, err := testutil.RunGitFlow(t, dir, "feature", "start", "test-branch")
-if err != nil {
-    t.Fatalf("Failed to start feature branch: %v\nOutput: %s", err, output)
-}
+# Eventually: treat specific warnings as errors
+pytest -W error::DeprecationWarning
 ```
 
-### State Verification
+**Note**: Don't use `-W error` globally while learning - it's too strict and can be discouraging.
 
-Verify both Git state and application-specific state:
+## CI/CD Integration
 
-```go
-// Check Git state
-if !testutil.BranchExists(t, dir, "feature/test-branch") {
-    t.Error("Expected feature branch to exist")
-}
+### Basic Test Command
 
-// Check application state
-state, err := testutil.LoadMergeState(t, dir)
-if state.Action != "finish" {
-    t.Errorf("Expected action to be 'finish', got '%s'", state.Action)
-}
+In CI, run tests with coverage:
+
+```bash
+pytest --cov=mypackage --cov-report=xml --cov-report=term
+```
+
+### Coverage Thresholds
+
+Start with relaxed thresholds and tighten over time:
+
+```ini
+# pytest.ini or pyproject.toml
+[tool:pytest]
+addopts = --cov=mypackage --cov-fail-under=60
 ```
 
 ## Best Practices
 
-1. **Always use testutil helpers** - Never execute Git commands directly
-2. **Include setup/cleanup** - Use defer to ensure cleanup happens
-3. **Test error conditions** - Verify failures behave correctly
-4. **Check intermediate state** - Don't just test final outcomes
-5. **Use descriptive assertions** - Include context in error messages
-6. **Test with remotes when relevant** - Many Git operations behave differently with remotes
-7. **Verify test helper implementations** - Don't trust placeholder functions that may not actually call commands
-8. **Create conflicts correctly** - Branch first, then add conflicting content (see conflict generation guidelines above)
-9. **Use Git internal state for verification** - Check `.git/` directory contents for reliable conflict state detection
+### DO
 
-## Test Implementation Anti-Patterns
+- Write tests for new features before marking them complete - TDD paradigms
+- Test edge cases (empty lists, None values, negative numbers)
+- Use descriptive test names that explain what's being tested
+- Keep tests simple and focused on one behavior
+- Use fixtures to avoid code duplication
+- Run tests before committing code
 
-### ❌ Common Testing Mistakes
+### DON'T
 
-1. **Trusting Placeholder Functions**:
-   ```go
-   // BAD: Helper function that doesn't actually test anything
-   func captureConfigAddBase(name string) error {
-       defer func() {
-           if r := recover(); r != nil {
-               // Convert panic to error for testing
-           }
-       }()
-       return nil // Placeholder - doesn't actually call git-flow
-   }
-   ```
+- Skip writing tests because you're "just learning"
+- Test implementation details (test behavior, not internals)
+- Write overly complex tests that are hard to understand
+- Ignore failing tests or mark them as "skip" without a plan to fix
+- Copy-paste test code without understanding it
+- Let warnings pile up (address them gradually)
 
-2. **Wrong Conflict Generation Sequence**:
-   ```go
-   // BAD: Creates file on base, then branches (inherits file - no conflict)
-   testutil.WriteFile(t, dir, "test.txt", "base content")
-   testutil.RunGit(t, dir, "add", ".")
-   testutil.RunGit(t, dir, "commit", "-m", "Add file to base")
-   testutil.RunGitFlow(t, dir, "feature", "start", "test")
-   testutil.WriteFile(t, dir, "test.txt", "feature content") // Modifying, not conflicting
-   ```
+## Getting Started
 
-3. **Incorrect Rebase State Verification**:
-   ```go
-   // BAD: Expects branch name during rebase conflict (always returns "HEAD")
-   currentBranch := testutil.GetCurrentBranch(t, dir)
-   if currentBranch != "feature/branch-name" {
-       t.Error("Not on expected branch") // Will always fail
-   }
-   ```
+### Minimal Test Example
 
-### ✅ Correct Implementations
+```python
+# tests/test_example.py
+def test_basic_addition():
+    """A simple test to get started"""
+    result = 1 + 1
+    assert result == 2
+```
 
-1. **Proper Helper Functions**:
-   ```go
-   // GOOD: Actually calls the command being tested
-   func captureConfigAddBase(t *testing.T, dir, name, parent string) error {
-       args := []string{"config", "add", "base", name, parent}
-       _, err := testutil.RunGitFlow(t, dir, args...)
-       return err
-   }
-   ```
+### Run Your First Test
 
-2. **Proper Conflict Generation**:
-   ```go
-   // GOOD: Creates branch first, adds content to both branches independently
-   testutil.RunGitFlow(t, dir, "feature", "start", "test")
-   testutil.WriteFile(t, dir, "test.txt", "feature content")
-   // ... commit to feature
-   testutil.RunGit(t, dir, "checkout", "develop")
-   testutil.WriteFile(t, dir, "test.txt", "develop content")
-   // ... commit to develop - now merge/rebase will conflict
-   ```
+```bash
+# Install pytest
+pip install pytest pytest-cov
 
-3. **Proper State Verification**:
-   ```go
-   // GOOD: Check actual Git internal state
-   rebaseMergeDir := filepath.Join(dir, ".git", "rebase-merge")
-   if _, err := os.Stat(rebaseMergeDir); os.IsNotExist(err) {
-       t.Error("Expected rebase conflict state")
-   }
-   ```
+# Run the test
+pytest tests/test_example.py
 
-## Debugging Test Failures
+# You should see: 1 passed
+```
 
-When tests fail, follow this systematic approach:
+## Guiding Principles for AI Assistance
 
-1. **Check Helper Function Implementations** - Ensure they actually call the intended commands
-2. **Verify Conflict Setup** - Confirm branches and files are created in correct sequence
-3. **Inspect Git State** - Use `.git/` directory contents to understand actual repository state
-4. **Test Configuration Persistence** - Verify that config changes are actually saved and old entries removed
-5. **Check Command Flag Logic** - Ensure flag detection properly influences command behavior
+When generating or modifying tests:
+
+1. **Match skill level**: Generate simple, clear tests for beginners
+2. **Provide context**: Explain what the test does and why
+3. **Use fixtures appropriately**: Show how to avoid duplication
+4. **Include assertions**: Every test needs at least one `assert`
+5. **Test edge cases**: But don't overwhelm with too many at once
+6. **Keep warnings visible**: Show warnings but don't fail on them initially
+7. **Encourage gradual improvement**: Start with basic coverage, improve over time
