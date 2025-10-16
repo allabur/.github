@@ -1,23 +1,50 @@
 ## Summary
+
 Explain the change and link the Issue.
 
-## Context
-Closes #<issue-id> — background and rationale.
+## Context: Related Issues
 
-## Changes
-- ...
+- Closes #[issue_number]
+- Fixes #[issue_number]
+- Related to #[issue_number]
 
-## Screenshots / Logs (if UI/CLI)
+## Changes Made
+
+- List of specific changes
+- Use bullet points for clarity
+- Include any architectural decisions
+
+## Testing
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing completed
+- [ ] All tests passing
+
+## Screenshots (if applicable)
+
+Include screenshots or GIFs for UI changes.
 
 ## Checklist
-- [ ] Tests added/updated
-- [ ] Lint, type-check, and CI pass
-- [ ] Docs/changelog updated
+
+- [ ] My code follows the style guidelines of this project: lint, type-check, and CI pass
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published
 - [ ] No sensitive data committed
 - [ ] Complies with Conventional Commits in title prefix (feat/fix/refactor/docs/test/chore)
 
-## Breaking changes
-Describe migration notes if any.
+## Deployment Notes
+
+Any special considerations for deployment or configuration changes.
+
+## Breaking Changes
+
+Detail any breaking changes and migration steps if applicable.
 
 ---
 
@@ -38,12 +65,14 @@ Describe migration notes if any.
 
 ---
 
-## Type of Contribution
+## Type of Changes
 
-- [ ] New instruction file.
-- [ ] New prompt file.
-- [ ] New chat mode file.
-- [ ] Other (please specify):
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Performance improvement
+- [ ] Code refactoring
 
 ---
 
