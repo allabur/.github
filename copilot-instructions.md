@@ -2,9 +2,11 @@
 
 ## About This Repository
 
-You should analyze the repo structure, files, and code to understand the project's
+Copilot should analyze the repo structure, files, and code to understand the project's
 purpose and conventions. This will help you provide relevant suggestions and complete
-tasks effectively. If README.md exists check it.
+tasks effectively.
+
+Files giving context: README.md, docs/, pyproject.toml, environment.yml.
 
 ---
 
@@ -34,36 +36,22 @@ You should analyze the codebase to identify the tech stack. The default stack in
 
 ## Development Workflow
 
-### 🚀 Quick Start
+Aquí tienes una versión reformulada y más limpia, en estilo claro y profesional, adecuada para un archivo GitHub Copilot Instructions.md o CONTRIBUTING.md. He mantenido el tono instructivo y consistente con los estándares de documentación técnica moderna:
 
-Set up your development environment with `mamba` and verify your setup:
+### 🚀 Quick Start — Terminal & Environment Setup
 
-```bash
-# Create and activate the mamba environment
-mamba env create -f environment.yml
-mamba activate <project-name>
-
-# Install the package in editable mode with dev dependencies
-pip install -e ".[dev]"
-
-# Verify setup by running checks
-pytest -q
-ruff check .
-mypy .
-```
-
-**Alternative for existing environments:**
-
-```bash
-# Activate existing environment
-mamba activate <project-name>
-
-# Update dependencies if needed
-mamba env update -f environment.yml --prune
-
-# Run verification
-pytest -q && ruff check . && mypy .
-```
+1. Preferred shell: Use bash (Mamba is initialized there by default).
+2. Check active environment: If your terminal prompt shows (<project-env>), the
+   environment is active, proceed to step 8.
+3. Confirm the environment name defined in `environment.yml`: <project-env>.
+4. Try to activate: `mamba activate <project-env>`. If successful, proceed to step 8.
+5. If activation fails: Create the environment using `mamba env create -f environment.yml`.
+6. Try to activate again: `mamba activate <project-env>`.
+7. If activation fails again: Troubleshoot the issue, then retry activation.
+8. If activation is successful: Proceed to set up your development environment.
+9. Update dependencies to match environment.yml: `mamba env update -f environment.yml --prune`.
+10. Install the package in editable mode with dev dependencies: `pip install -e ".[dev]"`.
+11. Run tests and static checks to ensure everything works correctly: `pytest -q && ruff check . && mypy .`.
 
 ### [Commit Guidelines](copilot/my-commit-messages.instructions.md)
 
@@ -180,7 +168,7 @@ dev = [
 Use **mamba** for isolated, reproducible environments:
 
 ```yaml
-name: myproject
+name: <project-env>
 channels:
   - conda-forge
 dependencies:
@@ -196,7 +184,7 @@ dependencies:
 
 ```bash
 mamba env create -f environment.yml
-mamba activate myproject
+mamba activate <project-env>
 ```
 
 ---
