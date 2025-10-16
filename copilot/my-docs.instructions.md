@@ -16,7 +16,7 @@ When creating or updating documentation:
 
 ## Documenting Code
 
-### Docstring Standards: NumPy-Style Format
+### Docstring Standards: NumPy-Style Format {#docstrings}
 
 ALL public functions, classes, and methods MUST include NumPy-style docstrings with these sections:
 
@@ -68,7 +68,7 @@ def function_name(param1: type1, param2: type2) -> return_type:
 
 ```
 
-### Type Hints: Modern Python Syntax (mypy-compatible)
+### Type Hints: Modern Python Syntax (mypy-compatible) {#type-hints}
 
 ALL function signatures MUST include type hints using modern Python 3.10+ syntax:
 
@@ -112,7 +112,7 @@ def transform(
 - Enhances IDE autocomplete
 - Reduces runtime errors
 
-### Inline Comments
+### Inline Comments {#inline-comments}
 
 **DO**:
 
@@ -128,7 +128,7 @@ def transform(
 - Over-comment self-explanatory code
 - Use comments as a substitute for clear code
 
-### Section Tags
+### Section Tags {#section-tags}
 
 For large modules, use section headers:
 
@@ -144,7 +144,7 @@ For large modules, use section headers:
 
 ```
 
-## Required Documentation Files
+## Required Documentation Files {#required-docs}
 
 ### README.md (Root)
 

@@ -2,17 +2,9 @@
 
 ## About This Repository
 
-This is a **default `.github` repository** for the `allabur` GitHub account. All health files, workflows, and AI agent instructions defined here automatically apply to any repository under this account that doesn't have its own versions.
-
-**Key Components:**
-
-- **Health Files**: CODEOWNERS, PR templates, issue templates that apply org-wide
-- **Reusable Workflows**: Shared CI/CD workflows in `workflows/`
-- **AI Agent Instructions**: Modular guidelines in `instructions/` for coding, testing, commits, CI/CD, reviews, and docs
-- **Chat Modes & Prompts**: AI agent personas (`chatmodes/`) and reusable prompts (`prompts/`)
-- **Reference Projects**: `refs/` contains external projects for studying patterns (awesome-copilot, feedbackflow)
-
-**How to Extend**: Create project-specific `.github/copilot-instructions.md` in individual repos to override or augment these defaults. Reference detailed guidelines via: `[Coding](instructions/my-code.instructions.md)`
+You should analyze the repo structure, files, and code to understand the project's
+purpose and conventions. This will help you provide relevant suggestions and complete
+tasks effectively. If README.md exists check it.
 
 ---
 
@@ -28,7 +20,7 @@ This is a **default `.github` repository** for the `allabur` GitHub account. All
 
 ## Tech Stack
 
-**Default Stack (Python Projects):**
+You should analyze the codebase to identify the tech stack. The default stack includes:
 
 | Tool   | Purpose                | Version |
 | ------ | ---------------------- | ------- |
@@ -37,10 +29,6 @@ This is a **default `.github` repository** for the `allabur` GitHub account. All
 | ruff   | Linting & Formatting   | Latest  |
 | mypy   | Type Checking          | Latest  |
 | mamba  | Environment Management | Latest  |
-
-### CI/CD
-
-Continuous integration is defined in `.github/workflows/ci.yml` and runs on every push and pull request.
 
 ---
 
@@ -77,32 +65,9 @@ mamba env update -f environment.yml --prune
 pytest -q && ruff check . && mypy .
 ```
 
-### 📝 Commit Guidelines
+### [Commit Guidelines](copilot/my-commit-messages.instructions.md)
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
-
-- `feat:` - New feature (minor version bump)
-- `fix:` - Bug fix (patch version bump)
-- `refactor:` - Code refactoring (no version bump)
-- `docs:` - Documentation changes (no version bump)
-- `test:` - Test additions/changes (no version bump)
-- `ci:` - CI/CD changes (no version bump)
-- `chore:` - Maintenance tasks (no version bump)
-
-Add `!` for breaking changes: `feat!:` or `fix!:` (major version bump)
-
-**Special Case - Jupyter Notebooks**: Use `notebook({filename}): WIP updates {YYYY-MM-DD}` format, ignoring outputs/metadata.
-
-**Examples:**
-
-```
-feat(api): add user authentication endpoint
-fix(parser): handle null values in JSON response
-docs: update installation instructions
-notebook(analysis): WIP updates 2025-10-14
-```
-
-### 🐛 Issues
+### [Issues](ISSUE_TEMPLATE/)
 
 Generate issues using templates in `.github/ISSUE_TEMPLATE/`. Required sections:
 
@@ -111,16 +76,9 @@ Generate issues using templates in `.github/ISSUE_TEMPLATE/`. Required sections:
 3. **Acceptance Criteria** - Definition of done
 4. **Test Plan** - How to verify the fix
 
-### 🔀 Pull Requests
+### [Pull Requests](copilot/my-pull-request.instructions.md)
 
-**Requirements:**
-
-- Keep PRs small (≤ 300 lines of diff)
-- Include tests for new features and bug fixes
-- Update documentation as needed
-- Ensure all CI checks pass (green status)
-
-### 🤖 Task Delegation
+### Task Delegation
 
 When assigned an issue:
 
@@ -130,7 +88,7 @@ When assigned an issue:
 4. Iterate on reviewer feedback
 5. Ensure all checks pass before requesting final review
 
-**AI Agent Control**: See `instructions/taming-copilot.instructions.md` for directives on controlling AI behavior (primacy of user commands, factual verification, surgical code edits).
+**AI Agent Control**: See `copilot/taming-copilot.instructions.md` for directives on controlling AI behavior (primacy of user commands, factual verification, surgical code edits).
 
 ---
 
@@ -138,20 +96,7 @@ When assigned an issue:
 
 ### This Repository Layout
 
-```
-.github/
-├── workflows/          # Reusable CI/CD workflows (ci.yml, release.yml, pre-release.yml)
-├── instructions/       # Modular AI agent instructions (*.instructions.md)
-├── chatmodes/          # AI personas for specialized assistance (*.chatmode.md)
-├── prompts/            # Reusable task-specific prompts (*.prompt.md)
-├── refs/               # Reference projects for studying patterns
-│   ├── awesome-copilot/    # GitHub Copilot customizations collection
-│   └── feedbackflow/       # C#/.NET reference project
-├── ISSUE_TEMPLATE/     # Org-wide issue templates
-├── copilot-instructions.md # This file (overview for AI agents)
-├── PULL_REQUEST_TEMPLATE.md
-└── CODEOWNERS
-```
+Check the structure of the repo to understand it correctly. I use to work with src-layout.
 
 ### Standard Python Project Layout
 
@@ -179,13 +124,11 @@ project/
 
 ### Directory Guidelines
 
-| Directory        | Purpose               | Notes                                                                                                             |
-| ---------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `docs/`          | Project documentation | User guides, API reference, tutorials                                                                             |
-| `data/`          | Sample datasets       | For examples or tests only                                                                                        |
-| `notebooks/`     | Jupyter notebooks     | Exploration only, not production                                                                                  |
-| `src/<package>/` | Python source code    | Use ["src" layout](https://packaging.python.org/en/latest/tutorials/packaging-projects/#structuring-your-project) |
-| `tests/`         | Test suite            | Mirror `src/` structure                                                                                           |
+- **`docs/`**: Project documentation including user guides, API reference, and tutorials
+- **`data/`**: Sample datasets for examples or tests only
+- **`notebooks/`**: Jupyter notebooks for exploration only, not for production use
+- **`src/<package>/`**: Python source code following the ["src" layout](https://packaging.python.org/en/latest/tutorials/packaging-projects/#structuring-your-project)
+- **`tests/`**: Test suite that mirrors the `src/` structure
 
 **Language:** All code, comments, and documentation are written in **English** for consistency and clarity.
 

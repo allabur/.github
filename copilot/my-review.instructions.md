@@ -85,7 +85,7 @@ When conducting code reviews:
 - No security vulnerabilities are present
 - Performance impact is acceptable
 
-## Code Review Checklist
+## [Code](my-code.instructions.md) Review Checklist
 
 Before approving or merging code, verify the following:
 
@@ -102,29 +102,7 @@ Before approving or merging code, verify the following:
   - Public API names make sense in context
   - Follow naming conventions (snake_case for functions, PascalCase for classes)
 
-### Documentation
-
-- [ ] **Docstrings**: Does every public function/class have up-to-date NumPy-style docstrings?
-
-  - Explains purpose, parameters, and return values
-  - Includes examples where helpful
-  - Raises section for important exceptions
-
-- [ ] **Documentation Files**: Are docs updated for any new features or changes?
-
-  - README reflects current functionality
-  - Usage examples still work
-  - API documentation is accurate
-  - CHANGELOG updated with changes
-
-- [ ] **Type Annotations**: Are functions and methods properly type-hinted?
-  - Modern Python 3.9+ syntax (`list`, `dict`, not `List`, `Dict`)
-  - Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
-  - Use `X | None` instead of `Optional[X]` (Python 3.10+)
-  - Run `mypy` in strict mode - no typing issues
-  - Types are readable and necessary
-
-### Error Handling & Testing
+### Error Handling & [Testing](my-tests.instructions.md)
 
 - [ ] **Error Handling**: Are exceptions used appropriately?
 
@@ -145,6 +123,28 @@ Before approving or merging code, verify the following:
   - Run tests with `-W error` to check
   - Address or filter harmless warnings
   - No new deprecation or resource warnings
+
+### [Documentation](my-docs.instructions.md)
+
+- [ ] **Docstrings**: Does every public function/class have up-to-date NumPy-style docstrings?
+
+  - Explains purpose, parameters, and return values
+  - Includes examples where helpful
+  - Raises section for important exceptions
+
+- [ ] **Documentation Files**: Are docs updated for any new features or changes?
+
+  - README reflects current functionality
+  - Usage examples still work
+  - API documentation is accurate
+  - CHANGELOG updated with changes
+
+- [ ] **Type Annotations**: Are functions and methods properly type-hinted?
+  - Modern Python 3.9+ syntax (`list`, `dict`, not `List`, `Dict`)
+  - Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
+  - Use `X | None` instead of `Optional[X]` (Python 3.10+)
+  - Run `mypy` in strict mode - no typing issues
+  - Types are readable and necessary
 
 ### Performance & Security
 
@@ -182,7 +182,7 @@ Before approving or merging code, verify the following:
   - Breaking changes properly communicated
   - Version bump appropriate (major if breaking)
 
-### Process & Integration
+### [Process](my-commit-messages.instructions.md) & [Integration](my-ci-cd.instructions.md)
 
 - [ ] **Commits & Changelog**: Are commits well-formed?
 
@@ -228,7 +228,7 @@ Use this structure for review comments:
 
 **Example**:
 
-```markdown
+````markdown
 **[Severity: Major]**
 
 **Issue**: Missing type hints on function parameters
@@ -237,13 +237,14 @@ Use this structure for review comments:
 and help catch type-related errors before runtime.
 
 **Suggestion**: Add type hints to all parameters and return values:
-\`\`\`python
+
+```python
 def process_data(items: list[dict[str, str]], threshold: float | None = None) -> dict[str, int]:
 ...
-\`\`\`
-
-**Reference**: See [Type Hints Guidelines](../my-docs.instructions.md#type-hints)
 ```
+
+**Reference**: See [Type Hints Guidelines](my-docs.instructions.md#type-hints)
+````
 
 ## Best Practices for Reviewers
 
