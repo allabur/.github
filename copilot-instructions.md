@@ -260,31 +260,31 @@ mamba activate myproject
 
 ## Detailed Guidelines
 
-### [Coding](instructions/my-code.instructions.md)
+### [Coding](copilot/my-code.instructions.md)
 
 Core principles, naming conventions (PEP 8), type hints (Python 3.10+), error handling patterns.
 
-### [Testing](instructions/my-tests.instructions.md)
+### [Testing](copilot/my-tests.instructions.md)
 
 Pytest framework, AAA pattern, coverage goals (60%→75%→90%), test organization strategies.
 
-### [Documentation](instructions/my-docs.instructions.md)
+### [Documentation](copilot/my-docs.instructions.md)
 
 Documentation standards and best practices for code, APIs, and user guides.
 
-### [CI/CD](instructions/my-ci-cd.instructions.md)
+### [CI/CD](copilot/my-ci-cd.instructions.md)
 
 Required CI steps (ruff, mypy, pytest), semantic versioning with python-semantic-release, Git Flow branching.
 
-### [Reviewing](instructions/my-review.instructions.md)
+### [Reviewing](copilot/my-review.instructions.md)
 
 Code review guidelines and best practices for pull requests.
 
-### [Commit Messages](instructions/my-commit-messages.instructions.md)
+### [Commit Messages](copilot/my-commit-messages.instructions.md)
 
 Detailed conventional commits specification including Jupyter notebook conventions.
 
-### [Taming Copilot](instructions/taming-copilot.instructions.md)
+### [Taming Copilot](copilot/taming-copilot.instructions.md)
 
 **META-INSTRUCTIONS**: Controls AI agent behavior - primacy of user directives, factual verification over assumptions, surgical code modifications, intelligent tool usage.
 
