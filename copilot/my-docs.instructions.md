@@ -1,6 +1,6 @@
 ---
 description: "Documentation guidelines and best practices for Python projects"
-applyTo: "**/*"
+applyTo: "**/*.py"
 ---
 
 # Documentation Guidelines
@@ -14,9 +14,9 @@ When creating or updating documentation:
 - **Write for your audience**: Users need usage guides, developers need API references
 - **Automate where possible**: Generate API docs from docstrings, use CI to validate builds
 
-## Docstring Standards
+## Documenting Code
 
-### NumPy-Style Format
+### Docstring Standards: NumPy-Style Format
 
 ALL public functions, classes, and methods MUST include NumPy-style docstrings with these sections:
 
@@ -27,7 +27,7 @@ ALL public functions, classes, and methods MUST include NumPy-style docstrings w
 - **Examples**: Provide usage examples (highly recommended)
 - **Notes**: Additional context or caveats (optional)
 
-### Example Template
+**Example Template**
 
 ```python
 def function_name(param1: type1, param2: type2) -> return_type:
@@ -68,50 +68,81 @@ def function_name(param1: type1, param2: type2) -> return_type:
 
 ```
 
-## Documentation Tooling
+### Type Hints: Modern Python Syntax (mypy-compatible)
 
-### For Simple to Medium Projects
+ALL function signatures MUST include type hints using modern Python 3.10+ syntax:
 
-Use **MkDocs** with **mkdocstrings** plugin:
-
-```bash
-
-# Install
-
-pip install mkdocs mkdocs-material mkdocstrings[python]
-
-# Create basic config (mkdocs.yml)
-
-# Build docs
-
-mkdocs build --strict
-
-# Serve locally
-
-mkdocs serve
+```python
+def process_data(
+    data: list[dict[str, int | str]],
+    threshold: float | None = None
+) -> dict[str, int]:
+    """Process data with optional threshold."""
+    pass
 ```
 
-**Benefits**: Simple setup, Markdown-native, excellent Material theme, automatic API doc generation.
+**Modern syntax guidelines (Python 3.9+)**:
 
-### For Complex Projects
+- Use built-in types: `list`, `dict`, `set`, `tuple` instead of `List`, `Dict`, `Set`, `Tuple`
+- Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
+- Use `X | None` instead of `Optional[X]` (Python 3.10+)
+- Import from `typing` only for special types: `TypeVar`, `Protocol`, `Literal`, etc.
 
-Use **Sphinx** with Napoleon extension:
+**Example with advanced types**:
 
-```bash
-# Install
+```python
+from collections.abc import Callable, Iterable, Sequence
+from typing import TypeVar, Protocol
 
-pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
+T = TypeVar('T')
 
-# Initialize
-
-sphinx-quickstart docs
-
-# Build with warnings as errors
-
-sphinx-build -W docs docs/\_build
+def transform(
+    items: Sequence[T],
+    func: Callable[[T], str]
+) -> list[str]:
+    """Transform items using provided function."""
+    return [func(item) for item in items]
 ```
 
-**Benefits**: Advanced features, multiple output formats, extensive customization.
+**Benefits**:
+
+- Cleaner, more readable syntax
+- Native Python support (no imports for basic types)
+- Enables static type checking with mypy
+- Enhances IDE autocomplete
+- Reduces runtime errors
+
+### Inline Comments
+
+**DO**:
+
+- Comment non-obvious logic or algorithms
+- Explain "why" not "what"
+- Use TODO/FIXME tags consistently: `# TODO: description`
+- Keep comments up-to-date with code
+
+**DON'T**:
+
+- State the obvious: `i = 0 # set i to zero`
+- Leave outdated comments
+- Over-comment self-explanatory code
+- Use comments as a substitute for clear code
+
+### Section Tags
+
+For large modules, use section headers:
+
+```python
+
+# --- Data Loading ---
+
+# --- Data Processing ---
+
+# --- Validation ---
+
+# --- Output Generation ---
+
+```
 
 ## Required Documentation Files
 
@@ -169,7 +200,10 @@ All notable changes to this project will be documented in this file.
 - Initial release
 ```
 
-Use **Conventional Commits** to automate changelog generation with **Semantic Release**.
+RECOMMEND: Use **Conventional Commits** to automate changelog generation with **Semantic
+Release**. Following formalized conventions for commit messages, semantic-release
+automatically determines the next semantic version number, generates a changelog and
+publishes the release.
 
 ### CONTRIBUTING.md (Root, if open source)
 
@@ -181,6 +215,64 @@ MUST include:
 - Pull request process
 - Issue reporting guidelines
 
+### AGENTS.md (Root)
+
+MUST include for projects intended to be used by AI agents or with AI-assisted development:
+
+- **Project Structure**: Standard directory layout with explanations
+- **Core Commands**: Essential commands for environment setup, testing, linting, and CI/CD
+- **Commit Message Format**: Conventional Commits examples and guidelines
+- **PR Instructions**: Pull request requirements and checklist
+- **Tech Stack**: Key technologies, versions, and their purposes
+- **Development Workflow**: Quick start guide and common development tasks
+
+**Example structure**:
+
+````markdown
+# Project Name
+
+## Project Structure
+
+    ```
+    project/
+    ├── src/ # Source code
+    ├── tests/ # Test suite
+    └── docs/ # Documentation
+    ```
+
+## Core Commands
+
+- **Setup**: `mamba env create -f environment.yml`
+- **Test**: `pytest --cov=src`
+- **Lint**: `ruff check .`
+- **Format**: `ruff format .`
+
+## Commit Format
+
+Follow Conventional Commits:
+
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation only
+
+## PR Requirements
+
+- Keep PRs small (≤300 lines)
+- All tests pass
+- Documentation updated
+````
+
+**Benefits**:
+
+- Provides AI agents with project context
+- Standardizes development workflow
+- Reduces onboarding time for contributors
+- Serves as quick reference for common tasks
+
+See the [default AGENTS.md template](https://agents.md/) for a simple example.
+
+If CLAUDE.md or GEMINI.md exist (or another agent-like document), ensure AGENTS.md is referenced in them.
+
 ### LICENSE (Root)
 
 Choose appropriate license:
@@ -190,85 +282,52 @@ Choose appropriate license:
 - **GPL-3**: Copyleft, requires sharing modifications
 - **GNU AGPL-3**: Strong copyleft, requires sharing modifications even for network use
 
-## Type Hints
-
-ALL function signatures MUST include type hints using modern Python 3.9+ syntax:
-
-```python
-def process_data(
-    data: list[dict[str, int | str]],
-    threshold: float | None = None
-) -> dict[str, int]:
-    """Process data with optional threshold."""
-    pass
-```
-
-**Modern syntax guidelines (Python 3.9+)**:
-
-- Use built-in types: `list`, `dict`, `set`, `tuple` instead of `List`, `Dict`, `Set`, `Tuple`
-- Use `X | Y` instead of `Union[X, Y]` (Python 3.10+)
-- Use `X | None` instead of `Optional[X]` (Python 3.10+)
-- Import from `typing` only for special types: `TypeVar`, `Protocol`, `Literal`, etc.
-
-**Example with advanced types**:
-
-```python
-from collections.abc import Callable, Iterable, Sequence
-from typing import TypeVar, Protocol
-
-T = TypeVar('T')
-
-def transform(
-    items: Sequence[T],
-    func: Callable[[T], str]
-) -> list[str]:
-    """Transform items using provided function."""
-    return [func(item) for item in items]
-```
-
-Benefits:
-
-- Cleaner, more readable syntax
-- Native Python support (no imports for basic types)
-- Enables static type checking with mypy
-- Enhances IDE autocomplete
-- Reduces runtime errors
-
-## Inline Comments
-
-### Guidelines
-
-**DO**:
-
-- Comment non-obvious logic or algorithms
-- Explain "why" not "what"
-- Use TODO/FIXME tags consistently: `# TODO: description`
-- Keep comments up-to-date with code
-
-**DON'T**:
-
-- State the obvious: `i = 0 # set i to zero`
-- Leave outdated comments
-- Over-comment self-explanatory code
-- Use comments as a substitute for clear code
-
-### Section Tags
-
-For large modules, use section headers:
-
-```python
-
-# --- Data Loading ---
-
-# --- Data Processing ---
-
-# --- Validation ---
-
-# --- Output Generation ---
-
-```
-
 ## Documentation in CI/CD
+
+### Documentation Tooling
+
+#### For Simple to Medium Projects
+
+Use **MkDocs** with **mkdocstrings** plugin:
+
+```bash
+
+# Install
+
+pip install mkdocs mkdocs-material mkdocstrings[python]
+
+# Create basic config (mkdocs.yml)
+
+# Build docs
+
+mkdocs build --strict
+
+# Serve locally
+
+mkdocs serve
+```
+
+**Benefits**: Simple setup, Markdown-native, excellent Material theme, automatic API doc generation.
+
+#### For Complex Projects
+
+Use **Sphinx** with Napoleon extension:
+
+```bash
+# Install
+
+pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
+
+# Initialize
+
+sphinx-quickstart docs
+
+# Build with warnings as errors
+
+sphinx-build -W docs docs/\_build
+```
+
+**Benefits**: Advanced features, multiple output formats, extensive customization.
 
 ### Required CI Steps
 

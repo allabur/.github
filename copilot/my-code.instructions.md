@@ -1,6 +1,5 @@
 ---
 description: "General coding best practices and guidelines"
-applyTo: "**/*"
 ---
 
 # Coding Guidelines
@@ -37,31 +36,6 @@ applyTo: "**/*"
 - **Trailing commas**: Use in multiline structures
 - **String quotes**: Be consistent (prefer double quotes or use Black)
 - **Functions**: < 50 lines, single purpose, separate logical blocks with blank lines
-
-## Type Hints (Python 3.10+)
-
-**Required for ALL function signatures** using modern syntax:
-
-```python
-# Built-in types (no imports)
-def process_data(
-    items: list[dict[str, int | str]],
-    threshold: float | None = None
-) -> tuple[list[str], dict[str, float]]:
-    pass
-
-# Special types only
-from typing import Callable, Literal, TypeVar
-
-def transform(
-    data: list[T],
-    func: Callable[[T], str],
-    mode: Literal["fast", "slow"] = "fast"
-) -> list[str]:
-    pass
-```
-
-**Rules**: Use `X | Y` (not `Union`), `X | None` (not `Optional`), built-in types (`list` not `List`), match pandas/numpy types (`pd.DataFrame`, `np.ndarray`)
 
 ## Import Organization
 
@@ -105,49 +79,6 @@ with open('file.txt') as f:
 ```
 
 **DON'T**: Use bare `except:`, catch too broadly (`except Exception:`), fail silently (`except: pass`)
-
-## Documentation
-
-### Docstring Standards (NumPy-style)
-
-ALL public functions/classes MUST have docstrings:
-
-```python
-def calculate_statistics(
-    data: list[float],
-    include_median: bool = True
-) -> dict[str, float]:
-    """Calculate statistical measures for a dataset.
-
-    Parameters
-    ----------
-    data : list[float]
-        Numerical values to analyze.
-    include_median : bool, optional
-        Whether to include median calculation, by default True.
-
-    Returns
-    -------
-    dict[str, float]
-        Dictionary with keys 'mean', 'std', and optionally 'median'.
-
-    Raises
-    ------
-    ValueError
-        If data is empty or contains non-numeric values.
-
-    Examples
-    --------
-    >>> calculate_statistics([1, 2, 3, 4, 5])
-    {'mean': 3.0, 'std': 1.414, 'median': 3.0}
-    """
-```
-
-**Required**: Summary, Parameters, Returns. **Recommended**: Raises, Examples, Notes
-
-### Inline Comments
-
-**Use sparingly**: Explain "why" not "what". Keep updated. Use `TODO:`/`FIXME:` tags. Avoid stating the obvious
 
 ## Logging & Warnings
 
@@ -245,63 +176,29 @@ data = np.array(data)
 result = data ** 2 + 2 * data + 1  # Better than loop
 ```
 
-## Testing
-
-Design code to be testable - separate concerns, use dependency injection:
-
-```python
-# GOOD: Easy to test
-def complex_calculation(data: list[float]) -> float:
-    """Pure function - easy to test."""
-    return sum(data) / len(data)
-
-def process_and_save(filename: str) -> None:
-    """Orchestration - test with mocks."""
-    data = load_from_database()
-    result = complex_calculation(data)  # Already tested
-    save_to_file(filename, result)
-```
-
-**Requirements**: Write unit tests for all public functions, test positive and negative cases, use descriptive names, follow AAA pattern (Arrange-Act-Assert), mock external dependencies
-
-**Mocking example**:
-
-```python
-from unittest.mock import Mock, patch
-
-def test_api_call_success():
-    mock_response = Mock()
-    mock_response.json.return_value = {"status": "success"}
-
-    with patch('requests.get', return_value=mock_response):
-        result = fetch_data("https://api.example.com")
-
-    assert result["status"] == "success"
-```
-
 ## Modern Python Idioms
 
-**List comprehensions**:
+### List comprehensions
 
 ```python
 squares = [x**2 for x in range(10)]
 evens = [x for x in range(10) if x % 2 == 0]
 ```
 
-**f-strings**:
+### f-strings
 
 ```python
 message = f"Hello, {name}! You are {age} years old."
 ```
 
-**Context managers**:
+### Context managers
 
 ```python
 with open('file.txt') as f:
     data = f.read()
 ```
 
-**pathlib over os.path**:
+### pathlib over os.path
 
 ```python
 from pathlib import Path
@@ -310,7 +207,7 @@ if config_path.exists():
     data = config_path.read_text()
 ```
 
-**enumerate and zip**:
+### enumerate and zip
 
 ```python
 for i, item in enumerate(items, start=1):
@@ -320,7 +217,7 @@ for name, score in zip(names, scores):
     print(f"{name}: {score}")
 ```
 
-**Modern data structures**:
+### Modern data structures
 
 ```python
 # dataclasses
@@ -344,12 +241,20 @@ counts = defaultdict(int)
 word_counts = Counter(words)
 ```
 
+## Testing
+
+See [Testing Guidelines](./my-tests.instructions.md)
+
+## Documentation
+
+Document code following [Documentation Guidelines](./my-docs.instructions.md).
+
 ## Code Quality Checklist
 
 ### Before Committing
 
 - [ ] Passes `ruff format` and `ruff check .`
-- [ ] Passes `mypy` in strict mode
+- [ ] Passes `mypy` for type checking
 - [ ] Tests pass, coverage ≥ 70% (target: 90%)
 - [ ] All public functions have NumPy-style docstrings
 - [ ] All functions have type hints

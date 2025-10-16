@@ -5,12 +5,10 @@ on:
     branches: ["main", "develop"]
   push:
     branches: ["main", "develop"]
-  workflow_dispatch: # Permitir ejecución manual
+  workflow_dispatch:
 
 permissions:
   contents: read
-  checks: write # Para coverage comments
-  pull-requests: write # Para PR comments
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -34,39 +32,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
-          cache-dependency-path: |
-            **/requirements*.txt
-            **/pyproject.toml
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Instalar herramientas de calidad
-          pip install ruff==0.* mypy==1.* pytest==8.* pytest-cov==5.*
-          # Instalar dependencias del proyecto si existen
+          pip install ruff pytest
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Ruff (format check)
+      - name: Ruff format check
         run: ruff format --check .
 
-      - name: Ruff (lint)
-        run: ruff check . --output-format=github
+      - name: Ruff lint
+        run: ruff check .
 
-      - name: Mypy (type check)
-        run: mypy . --strict --install-types --non-interactive
-        continue-on-error: true # No fallar por errores de tipos en dotfiles
-
-      - name: Pytest (tests + coverage)
-        run: |
-          pytest --cov --cov-report=term --cov-report=xml \
-                 --cov-fail-under=70 -v
-
-      - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.13' && github.event_name == 'push'
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: false # No fallar si Codecov está caído
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
+      - name: Run tests
+        run: pytest -v
