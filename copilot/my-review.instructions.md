@@ -1,6 +1,5 @@
 ---
 description: "Code review guidelines and best practices for Python projects"
-applyTo: "**/*"
 ---
 
 # Code Review Guidelines

@@ -1,6 +1,5 @@
 ---
 description: "CI/CD guidelines and best practices for automated workflows"
-applyTo: "**/*"
 ---
 
 # CI/CD Guidelines
@@ -27,22 +26,9 @@ Every CI workflow must include:
    - Cache dependencies for faster builds
    - Install dev dependencies: `mamba env create -f environment.yml` or `pip install -r requirements-dev.txt`
 
-2. **Code Quality Checks**
-
-   - **Ruff**: Primary linter and formatter (replaces flake8, black, isort)
-   - **mypy**: Type checking in strict mode
-   - Treat all warnings as errors (`-W error`)
-
-3. **Testing**
-
-   - Run full test suite: `pytest --cov=<package>`
-   - Minimum coverage: 70% (target: 90%)
-   - Fail build if coverage drops below threshold
-   - Use pytest with strict settings
-
-4. **Documentation Build**
-   - Build docs with warnings as errors
-   - Verify no broken references or syntax issues
+2. [**Code Quality Checks**](my-code.instructions.md)
+3. [**Testing**](my-tests.instructions.md)
+4. [**Documentation Build**](my-docs.instructions.md)
 
 ### CI Configuration
 
@@ -58,44 +44,7 @@ Every CI workflow must include:
 - Releases only from `main` branch
 - Feature branches merge to `develop` via pull requests
 
-### Conventional Commits
-
-**MANDATORY** commit message format:
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-**Types** (affect versioning):
-
-- `feat:` - New feature (minor bump)
-- `fix:` - Bug fix (patch bump)
-- `perf:` - Performance improvement (patch bump)
-- `docs:` - Documentation only (no version bump)
-- `test:` - Adding/updating tests (no version bump)
-- `build:` - Build system changes (no version bump)
-- `ci:` - CI configuration changes (no version bump)
-- `refactor:` - Code refactoring (no version bump)
-- `style:` - Formatting changes (no version bump)
-- `chore:` - Maintenance tasks (no version bump)
-
-**Breaking Changes**:
-
-- Add `!` after type: `feat!:` or `fix!:`
-- Include `BREAKING CHANGE:` in footer (triggers major bump)
-
-**Examples**:
-
-```
-feat(api): add user authentication endpoint
-fix(parser): handle null values in JSON response
-docs: update installation instructions
-feat!: remove deprecated API v1 endpoints
-```
+### [Conventional Commits](my-commit-messages.instructions.md)
 
 ### Release Automation
 
