@@ -49,6 +49,93 @@ When to use alternatives:
 - Mirrored (subdirectories): Only when src/ has multiple levels of subdirectories
 - By type (unit/integration): Only for large projects with many types of tests
 
+### Test Organization Strategies
+
+#### Flat Structure (Default)
+
+Use simple test functions for straightforward testing:
+
+```python
+def test_add_numbers():
+    """Test adding two positive numbers."""
+    assert add(2, 3) == 5
+
+def test_add_negative_numbers():
+    """Test adding two negative numbers."""
+    assert add(-1, -1) == -2
+```
+
+**Use when**: You have simple, independent test cases (< 5 tests per module).
+
+#### Class-Based Grouping
+
+Group related tests using pytest classes when you have multiple related test scenarios:
+
+```python
+class TestDateToDaytypeSingleDate:
+    """Test cases for single date input."""
+
+    def test_workday_classification(self) -> None:
+        """Test that weekdays are correctly classified as Workdays."""
+        date = pd.Timestamp("2018-02-05")  # Monday
+        result = date_to_daytype(date)
+        assert result == "Workday"
+
+    def test_saturday_classification(self) -> None:
+        """Test that Saturday is correctly classified as Weekend."""
+        date = pd.Timestamp("2018-02-10")  # Saturday
+        result = date_to_daytype(date)
+        assert result == "Weekend"
+
+
+class TestDateToDaytypeVectorized:
+    """Test cases for vectorized operations."""
+
+    def test_series_of_workdays(self) -> None:
+        """Test vectorized classification of multiple workdays."""
+        dates = pd.Series([
+            pd.Timestamp("2018-02-05"),
+            pd.Timestamp("2018-02-06"),
+        ])
+        result = date_to_daytype(dates)
+        assert all(result == "Workday")
+
+
+class TestDateToDaytypeEdgeCases:
+    """Test cases for edge cases and boundary conditions."""
+
+    def test_leap_year_february_29(self) -> None:
+        """Test that February 29 in leap year is handled correctly."""
+        date = pd.Timestamp("2024-02-29")
+        result = date_to_daytype(date)
+        assert result == "Workday"
+```
+
+**Benefits of class-based organization**:
+
+- **Logical grouping**: Related tests stay together, improving readability
+- **Easy navigation**: Run specific test groups with `pytest tests/test_file.py::TestClassName`
+- **Clear documentation**: Class docstrings describe what aspect is being tested
+- **Shared setup**: Use class-level fixtures or setup methods when needed
+- **Better maintainability**: Changes in functionality affect one clear section
+
+**Use when**:
+
+- You have 5+ related tests for the same function
+- Tests cover different aspects (normal cases, edge cases, performance, integration)
+- You need shared fixtures or setup logic
+- You want to organize tests by feature/category
+
+**Common class naming patterns**:
+
+- `TestFunctionNameSingleInput` - Tests for single value inputs
+- `TestFunctionNameVectorized` - Tests for batch/vectorized operations
+- `TestFunctionNameEdgeCases` - Tests for boundary conditions
+- `TestFunctionNameIntegration` - Tests involving multiple components
+- `TestFunctionNamePerformance` - Performance and scalability tests
+
+**Note**: Classes in pytest are for organization only - they don't require `self` or inheritance unless using shared fixtures.
+
 ### AAA Pattern
 
 Use the **AAA pattern** for clear, readable tests:
