@@ -175,7 +175,7 @@ Before approving or merging code, verify the following:
   - Necessary and popular enough
   - Not adding heavy dependencies for trivial gains
   - Pinned to acceptable version range
-  - Added to `pyproject.toml` and `environment.yml`
+  - Added to `pyproject.toml`
 
 - [ ] **Backward Compatibility**: Does it maintain compatibility?
   - API changes marked with deprecation warnings

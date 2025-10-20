@@ -242,10 +242,10 @@ MUST include for projects intended to be used by AI agents or with AI-assisted d
 
 ## Core Commands
 
-- **Setup**: `mamba env create -f environment.yml`
-- **Test**: `pytest --cov=src`
-- **Lint**: `ruff check .`
-- **Format**: `ruff format .`
+- **Setup**: `uv sync`
+- **Test**: `uv run pytest --cov=src`
+- **Lint**: `uv run ruff check .`
+- **Format**: `uv run ruff format .`
 
 ## Commit Format
 
