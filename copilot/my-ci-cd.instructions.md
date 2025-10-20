@@ -32,7 +32,7 @@ Check the following workflow template for reference: `templates/ci.yml`
 - Developers create short-lived feature branches
 - Feature branches are merged back into `main` frequently (at least daily)
 
-### Commits Standard: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification)
+### Commits Guidelines: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification)
 
 - Use instructions from `my-commit-messages.instructions.md` for guidance.
 
