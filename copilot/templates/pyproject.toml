@@ -1,0 +1,259 @@
+# pyproject.toml - Python Project Configuration Template
+# This template follows PEP 621 standards and is optimized for uv package manager
+# Copy this file to your project root and customize as needed
+
+[project]
+# Required: Basic project metadata
+name = "myproject"  # Replace with your project name (lowercase, hyphens allowed)
+version = "0.1.0"  # Follow semantic versioning: MAJOR.MINOR.PATCH
+description = "A short, one-line description of your project"
+
+# Recommended: Additional metadata
+readme = "README.md"  # Path to README file
+
+# Python version requirement (PEP 440 format)
+# Options:
+#   ">=3.12"        - Flexible (recommended): 3.12, 3.13, 3.14+
+#   ">=3.12,<3.14"  - Conservative: only 3.12 and 3.13
+#   ">=3.13"        - Modern: 3.13+ (some packages may lack wheels)
+#   ">=3.10"        - Legacy: maximum compatibility
+# Note: Cannot use "latest" - must be valid PEP 440 specifier
+requires-python = ">=3.12"  # Recommended: balance of stability and modernity
+
+license = { text = "MIT" }  # Or { file = "LICENSE" }
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+maintainers = [
+    { name = "Maintainer Name", email = "maintainer@example.com" }
+]
+keywords = ["keyword1", "keyword2", "keyword3"]  # For PyPI search
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    # "Development Status :: 4 - Beta",
+    # "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# Production dependencies
+# Add packages with: uv add package-name
+dependencies = [
+    # "pandas>=2.0.0",
+    # "numpy>=1.24.0",
+]
+
+# Optional dependency groups
+[project.optional-dependencies]
+# Development tools: uv add --dev package-name
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+# Documentation: uv add --optional docs package-name
+docs = [
+    # "mkdocs>=1.5.0",
+    # "mkdocs-material>=9.0.0",
+    # "mkdocstrings[python]>=0.24.0",
+]
+# Testing extras
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",  # Parallel testing
+]
+
+# Project URLs
+[project.urls]
+Homepage = "https://github.com/username/myproject"
+Documentation = "https://myproject.readthedocs.io"
+Repository = "https://github.com/username/myproject"
+Issues = "https://github.com/username/myproject/issues"
+Changelog = "https://github.com/username/myproject/blob/main/CHANGELOG.md"
+
+# Optional: Entry points for CLI commands
+# [project.scripts]
+# mycommand = "myproject.cli:main"
+
+# Optional: GUI scripts
+# [project.gui-scripts]
+# myapp = "myproject.gui:main"
+
+# Build system configuration (required)
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Alternative build backends:
+# For setuptools: requires = ["setuptools>=61.0", "wheel"]
+# For flit: requires = ["flit_core>=3.2"]
+
+# ============================================================================
+# Tool Configurations
+# ============================================================================
+
+# --- Ruff: Fast Python linter and formatter ---
+[tool.ruff]
+line-length = 88  # Black-compatible
+target-version = "py313"
+exclude = [
+    ".venv",
+    "venv",
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+# Enable these rule categories
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "W",   # pycodestyle warnings
+    "UP",  # pyupgrade (modern Python syntax)
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"tests/*" = ["S101"]      # Allow assert in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["myproject"]  # Replace with your package name
+
+# --- Pytest: Testing framework ---
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--cov=src",  # Coverage for src/ directory
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--strict-markers",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# --- Coverage.py: Code coverage measurement ---
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+precision = 2
+fail_under = 70  # Minimum coverage percentage
+
+# --- Mypy: Static type checking ---
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_unreachable = true
+
+# Per-module options
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# --- Black: Code formatter (optional, ruff can format too) ---
+# [tool.black]
+# line-length = 88
+# target-version = ["py313"]
+# include = '\.pyi?$'
+# extend-exclude = '''
+# /(
+#   \.venv
+#   | \.git
+#   | \.mypy_cache
+#   | \.pytest_cache
+#   | build
+#   | dist
+# )/
+# '''
+
+# --- Hatch: Project scaffolding (if using hatchling) ---
+[tool.hatch.build.targets.wheel]
+packages = ["src/myproject"]  # Replace with your package path
+
+# --- Bandit: Security linter ---
+# [tool.bandit]
+# exclude_dirs = ["tests", ".venv"]
+# skips = ["B101"]  # Skip assert_used in tests
+
+# ============================================================================
+# Usage Guide
+# ============================================================================
+# 
+# Setup new project:
+#   1. Copy this file to your project root
+#   2. Replace 'myproject' with your actual project name
+#   3. Update metadata (description, authors, URLs)
+#   4. Run: uv sync
+#
+# Add dependencies:
+#   uv add package-name              # Production
+#   uv add --dev package-name        # Development
+#   uv add --optional docs mkdocs    # Optional group
+#
+# Install project:
+#   uv sync                          # All dependencies
+#   uv sync --no-dev                 # Production only
+#
+# Run commands:
+#   uv run pytest                    # Run tests
+#   uv run ruff check .              # Lint code
+#   uv run ruff format .             # Format code
+#   uv run mypy .                    # Type check
+#
+# Update dependencies:
+#   uv lock --upgrade                # Update all
+#   uv lock --upgrade-package pandas # Update one
+#
+# Build package:
+#   uv build                         # Creates dist/
+#
+# ============================================================================

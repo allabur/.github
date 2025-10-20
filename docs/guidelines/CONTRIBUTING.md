@@ -5,6 +5,7 @@ Thank you for your interest in contributing! This document provides guidelines a
 ## Code of Conduct
 
 By participating in this project, you agree to:
+
 - Be respectful and inclusive of differing viewpoints and experiences
 - Use welcoming and inclusive language
 - Accept constructive criticism gracefully
@@ -26,28 +27,35 @@ By participating in this project, you agree to:
    - Minimal code example that reproduces the issue
 
 **Bug Report Template:**
+
 ```markdown
 ## Bug Description
+
 [Clear description of the bug]
 
 ## Steps to Reproduce
+
 1. Step one
 2. Step two
 3. Step three
 
 ## Expected Behavior
+
 [What should happen]
 
 ## Actual Behavior
+
 [What actually happens]
 
 ## Environment
+
 - OS: [e.g., Ubuntu 22.04, macOS 14.0, Windows 11]
 - Python Version: [e.g., 3.11.5]
 - Package Version: [e.g., 1.2.3]
 - Relevant Dependencies: [list key dependencies and versions]
 
 ## Additional Context
+
 [Stack traces, logs, screenshots]
 ```
 
@@ -60,24 +68,32 @@ By participating in this project, you agree to:
 5. **Show Examples** - Provide code examples of how it would be used
 
 **Enhancement Request Template:**
-```markdown
+
+````markdown
 ## Feature Description
+
 [Clear description of the proposed feature]
 
 ## Motivation
+
 [Why is this feature needed? What problem does it solve?]
 
 ## Proposed Solution
+
 [How should this feature work?]
 
 ## Example Usage
+
 ```python
 # Example code showing how the feature would be used
 ```
+````
 
 ## Alternatives Considered
+
 [What other approaches were considered?]
-```
+
+````
 
 ### Pull Requests
 
@@ -93,14 +109,16 @@ By participating in this project, you agree to:
    git checkout -b fix/your-bug-fix
    # or
    git checkout -b docs/improve-documentation
-   ```
+````
 
 3. **Commit Guidelines**
+
    - Follow [Conventional Commits](https://www.conventionalcommits.org/)
    - Write clear, descriptive commit messages
    - Use the imperative mood ("Add feature" not "Added feature")
    - Reference issues in commit messages
    - Format:
+
      ```
      <type>(<scope>): <subject>
 
@@ -110,6 +128,7 @@ By participating in this project, you agree to:
      ```
 
    **Commit Types:**
+
    - `feat`: New feature
    - `fix`: Bug fix
    - `docs`: Documentation changes
@@ -120,6 +139,7 @@ By participating in this project, you agree to:
    - `ci`: CI/CD changes
 
 4. **Code Quality Requirements**
+
    - Follow [PEP 8](https://peps.python.org/pep-0008/) style guide
    - Add type hints to all function signatures
    - Write NumPy-style docstrings for public functions
@@ -129,6 +149,7 @@ By participating in this project, you agree to:
    - Update documentation
 
 5. **Before Submitting Pull Request**
+
    ```bash
    # Format code
    ruff format .
@@ -157,9 +178,9 @@ By participating in this project, you agree to:
 
 #### Prerequisites
 
-- **Python**: 3.10 or later
+- **Python**: 3.13 or later
 - **Git**: 2.25 or later
-- **pip** or **conda**: For package management
+- **uv**: For package management (recommended)
 - **make** (optional): For build automation
 
 #### Local Development Setup
@@ -172,26 +193,19 @@ cd project-name
 # 2. Add upstream remote
 git remote add upstream https://github.com/ORIGINAL_OWNER/project-name.git
 
-# 3. Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# 3. Install uv (if not installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# or with conda
-conda env create -f environment.yml
-conda activate project-name
-
-# 4. Install development dependencies
-pip install -e ".[dev]"
-# or
-pip install -r requirements-dev.txt
+# 4. Create environment and install dependencies
+uv sync
 
 # 5. Install pre-commit hooks (if available)
-pre-commit install
+uv run pre-commit install
 
 # 6. Verify setup
-pytest
-ruff check .
-mypy src/
+uv run pytest
+uv run ruff check .
+uv run mypy src/
 ```
 
 #### Development Workflow
@@ -206,9 +220,9 @@ git checkout -b feature/my-new-feature
 
 # 3. Make changes and test iteratively
 # Edit code...
-pytest tests/test_mymodule.py
-ruff check .
-mypy src/mypackage/mymodule.py
+uv run pytest tests/test_mymodule.py
+uv run ruff check .
+uv run mypy src/mypackage/mymodule.py
 
 # 4. Commit changes
 git add .
@@ -229,6 +243,7 @@ git push origin feature/my-new-feature
 #### Test Requirements
 
 1. **Unit Tests**
+
    - Add tests for all new functionality
    - Update tests when modifying existing code
    - Use pytest fixtures for reusable components
@@ -236,6 +251,7 @@ git push origin feature/my-new-feature
    - Use descriptive test names
 
 2. **Integration Tests**
+
    - Test interactions between components
    - Use temporary databases or mock external services
    - Clean up resources after tests
@@ -256,10 +272,10 @@ def test_my_function_with_valid_input():
     """Test my_function with valid input."""
     # Arrange
     input_data = {"key": "value"}
-    
+
     # Act
     result = my_function(input_data)
-    
+
     # Assert
     assert result["status"] == "success"
     assert "data" in result
@@ -268,7 +284,7 @@ def test_my_function_with_invalid_input_raises_error():
     """Test my_function raises ValueError for invalid input."""
     # Arrange
     invalid_data = {}
-    
+
     # Act & Assert
     with pytest.raises(ValueError) as exc_info:
         my_function(invalid_data)
@@ -293,42 +309,45 @@ def test_process_data(sample_data):
 #### Documentation Requirements
 
 1. **Code Documentation**
+
    - Add NumPy-style docstrings to all public functions and classes
    - Include type hints on all function signatures
    - Provide usage examples in docstrings
    - Document exceptions that may be raised
 
 2. **Project Documentation**
+
    - Update README.md for user-facing changes
    - Add or update guides for new features
    - Keep CHANGELOG.md up to date
    - Update API documentation
 
 3. **Documentation Style**
+
    ```python
    def calculate_total(
        items: list[dict[str, float]],
        tax_rate: float = 0.0,
    ) -> float:
        """Calculate total price including tax.
-       
+
        Parameters
        ----------
        items : list[dict[str, float]]
            List of items with 'price' key.
        tax_rate : float, optional
            Tax rate as decimal (e.g., 0.08 for 8%), by default 0.0.
-       
+
        Returns
        -------
        float
            Total price including tax.
-       
+
        Raises
        ------
        ValueError
            If items is empty or contains invalid prices.
-       
+
        Examples
        --------
        >>> items = [{"price": 10.0}, {"price": 20.0}]
@@ -382,6 +401,7 @@ def test_process_data(sample_data):
 ## Recognition
 
 Contributors will be:
+
 - Listed in CONTRIBUTORS.md (if exists)
 - Mentioned in release notes for significant contributions
 - Recognized in project documentation where appropriate

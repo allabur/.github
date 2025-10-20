@@ -15,40 +15,30 @@ When creating or modifying CI/CD pipelines:
 
 ## Continuous Integration (CI)
 
-### Required CI Steps
-
 Every CI workflow must include:
 
-1. **Environment Setup**
-
-   - Use clean base image (Ubuntu latest)
-   - Install Python 3.12+ or project-specified version
-   - Cache dependencies for faster builds
-   - Install dev dependencies: `mamba env create -f environment.yml` or `pip install -r requirements-dev.txt`
-
+1. [**Environment Setup**](my-environment.instructions.md)
 2. [**Code Quality Checks**](my-code.instructions.md)
 3. [**Testing**](my-tests.instructions.md)
 4. [**Documentation Build**](my-docs.instructions.md)
 
-### CI Configuration
-
-- **Location**: `.github/workflows/ci.yml`
-- **Triggers**: Pull requests and pushes to main/develop branches
-- **Coverage Integration**: Upload to Codecov or Coveralls for tracking
+Check the following workflow template for reference: `templates/ci.yml`
 
 ## Continuous Deployment (CD)
 
-### Branching Strategy
+### Branching Strategy: Trunk-Based Development
 
-- **Git Flow**: Use develop → main branching model
-- Releases only from `main` branch
-- Feature branches merge to `develop` via pull requests
+- Use a single `main` branch for production-ready code
+- Developers create short-lived feature branches
+- Feature branches are merged back into `main` frequently (at least daily)
 
-### [Conventional Commits](my-commit-messages.instructions.md)
+### Commits Standard: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification)
 
-### Release Automation
+- Use instructions from `my-commit-messages.instructions.md` for guidance.
 
-- **Tool**: Python Semantic Release (PSR)
+### Release Automation: Semantic Versioning with Python Semantic Release
+
+- **Tool**: [Python Semantic Release](https://python-semantic-release.readthedocs.io/en/latest/index.html) (PSR)
 - **Trigger**: Merge to `main` branch
 - **Process**:
   1. Analyze commits since last release
@@ -59,7 +49,7 @@ Every CI workflow must include:
   6. Build distributions (sdist + wheel)
   7. Publish to PyPI
 
-### Security
+### Security:
 
 - **Secrets Management**: Store tokens in CI secrets (e.g., `PYPI_TOKEN`)
 - **Never commit**: API keys, passwords, tokens, or credentials
@@ -88,30 +78,8 @@ Every CI workflow must include:
 
 ## Workflow Template Structure
 
-```yaml
-name: CI
-on: [push, pull_request]
-jobs:
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
-      - name: Lint with Ruff
-        run: ruff check .
-      - name: Type check with mypy
-        run: mypy .
-      - name: Test with pytest
-        run: pytest --cov --cov-report=xml
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-```
+- CI: Lint → Test → Coverage → Docs. `templates/ci.yml`
+- CD: On `main` merge → Release → Publish. `templates/cd.yml`
 
 ## Guiding Principles for AI Assistance
 

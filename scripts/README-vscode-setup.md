@@ -1,8 +1,14 @@
-# VS Code Setup Script
+# Scripts de Utilidad
+
+Scripts para automatizar el setup del entorno de desarrollo y gestión de proyectos.
+
+## Disponibles
+
+### vscode-setup.sh
 
 Script para sincronizar instrucciones personalizadas de GitHub Copilot desde el repositorio dotfiles a VS Code.
 
-## ¿Qué Hace?
+#### ¿Qué Hace?
 
 Crea **symlinks individuales** de todos los archivos desde estas carpetas:
 
@@ -16,16 +22,16 @@ Hacia el directorio de VS Code:
 - **Linux**: `~/.config/Code/User/prompts/`
 - **Windows**: `%APPDATA%/Code/User/prompts/`
 
-## Ventajas de Symlinks
+#### Ventajas de Symlinks
 
 ✅ **Sincronización automática**: Al modificar un archivo en el repo, el cambio aparece inmediatamente en VS Code  
 ✅ **Gestión centralizada**: Un solo lugar para todas las instrucciones  
 ✅ **Control de versiones**: Todos los cambios tracked en Git  
 ✅ **Backups automáticos**: El script respalda archivos existentes antes de sobrescribirlos
 
-## Uso
+#### Uso
 
-### Instalación Inicial
+**Instalación Inicial:**
 
 ```bash
 cd /Users/allabur/dotfiles/.github
@@ -40,7 +46,7 @@ cd /Users/allabur/dotfiles/.github
 ./vscode-setup.sh -y
 ```
 
-### Opciones
+**Opciones:**
 
 ```
 -n, --dry-run    Mostrar acciones sin ejecutar cambios
@@ -48,6 +54,88 @@ cd /Users/allabur/dotfiles/.github
 -v, --verbose    Mostrar salida detallada
 -h, --help       Mostrar ayuda
 ```
+
+---
+
+### migrate-to-uv.sh
+
+Migra proyectos Python desde conda/mamba/pip/Poetry hacia el gestor de paquetes **uv**.
+
+#### ¿Qué Hace?
+
+- Detecta configuración existente (environment.yml, requirements.txt, Poetry)
+- Crea o actualiza pyproject.toml siguiendo PEP 621
+- Migra dependencias a uv
+- Instala y fija versión de Python
+- Actualiza .gitignore
+- Proporciona recomendaciones de limpieza
+
+#### Migraciones Soportadas
+
+- **conda/mamba** (environment.yml) → uv
+- **pip** (requirements.txt + requirements-dev.txt) → uv
+- **Poetry** (pyproject.toml) → uv (con ajustes manuales)
+
+#### Uso
+
+**Comandos básicos:**
+
+```bash
+# Vista previa sin hacer cambios
+./migrate-to-uv.sh --dry-run
+
+# Migrar manteniendo archivos antiguos como backup
+./migrate-to-uv.sh --keep-old
+
+# Migrar con Python 3.13
+./migrate-to-uv.sh --python 3.13
+
+# Migración completa instalando uv
+./migrate-to-uv.sh --install-uv --python 3.13
+```
+
+**Opciones:**
+
+```
+--dry-run       Mostrar lo que se haría sin aplicar cambios
+--keep-old      Mantener archivos antiguos (renombrar con extensión .old)
+--python VER    Especificar versión de Python (default: 3.13)
+--install-uv    Instalar uv si no está presente
+--help          Mostrar mensaje de ayuda
+```
+
+#### Requisitos Previos
+
+- Git repository recomendado (para fácil rollback)
+- uv instalado o usar flag `--install-uv`
+
+#### Ejemplo Completo
+
+```bash
+# 1. Clonar o navegar a tu proyecto
+cd /path/to/my-project
+
+# 2. Ver qué cambiaría el script
+../dotfiles/.github/scripts/migrate-to-uv.sh --dry-run --python 3.13
+
+# 3. Ejecutar migración manteniendo backups
+../dotfiles/.github/scripts/migrate-to-uv.sh --keep-old --python 3.13
+
+# 4. Verificar que todo funciona
+uv run python --version
+uv run pytest
+
+# 5. Limpiar archivos antiguos (si todo está bien)
+rm *.old
+
+# 6. Commit
+git add pyproject.toml uv.lock .gitignore
+git commit -m "chore: migrate to uv package manager"
+```
+
+---
+
+## VS Code Setup Script (Continuación)
 
 ### Variable de Entorno
 

@@ -14,13 +14,17 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 ### 🤖 AI Agent Configuration
 
 - **[copilot-instructions.md](copilot-instructions.md)**: Main instructions for GitHub Copilot
-- **[instructions/](instructions/)**: Modular coding guidelines
-  - Coding standards (PEP 8, type hints, error handling)
-  - Testing guidelines (pytest, AAA pattern, coverage)
-  - Documentation standards (NumPy-style docstrings)
-  - CI/CD workflows (conventional commits, semantic release)
-  - Code review guidelines
-  - Taming Copilot meta-instructions
+- **[copilot/](copilot/)**: Modular instruction files
+  - `my-code.instructions.md` - Coding standards (PEP 8, type hints, error handling)
+  - `my-tests.instructions.md` - Testing guidelines (pytest, AAA pattern, coverage)
+  - `my-docs.instructions.md` - Documentation standards (NumPy-style docstrings)
+  - `my-ci-cd.instructions.md` - CI/CD workflows (conventional commits, semantic release)
+  - `my-uv-environment.instructions.md` - uv package management guidelines
+  - `my-review.instructions.md` - Code review best practices
+  - `my-commit-messages.instructions.md` - Commit message conventions
+  - `my-pull-request.instructions.md` - PR templates and workflow
+  - `taming-copilot.instructions.md` - Meta-instructions for AI control
+- **[instructions/](instructions/)**: Legacy modular guidelines (being migrated to copilot/)
 - **[prompts/](prompts/)**: Task-specific reusable prompts
   - `/analyze-dataframe` - Data quality assessment
   - `/document-function` - Generate NumPy docstrings
@@ -31,6 +35,15 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
   - See [prompts/README.md](prompts/README.md) for full list
 - **[chatmodes/](chatmodes/)**: AI personas for specialized contexts
   - 4.1-Beast mode for autonomous agent behavior
+
+### 🛠️ Scripts & Templates
+
+- **[scripts/](scripts/)**: Automation scripts
+  - `vscode-setup.sh` - Sync Copilot instructions to VS Code
+  - `migrate-to-uv.sh` - Migrate projects from conda/mamba/pip/Poetry to uv
+  - See [scripts/README-vscode-setup.md](scripts/README-vscode-setup.md) for details
+- **[templates/](templates/)**: Project templates
+  - `pyproject.toml` - Python project configuration template following PEP 621
 
 ### ⚙️ Workflows
 
@@ -51,16 +64,38 @@ Default community health files, AI agent guidelines, and reusable GitHub Actions
 
 ## Quick Start
 
-### For Python Projects
+### For Python Projects (New Project)
 
 ```bash
-# Environment setup
-mamba env create -f environment.yml
-mamba activate project-name
-pip install -e ".[dev]"
+# 1. Install uv (once)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Verify setup
-pytest -q && ruff check . && mypy .
+# 2. Create new project
+uv init myproject && cd myproject
+
+# 3. Copy pyproject.toml template (optional)
+cp /path/to/dotfiles/.github/templates/pyproject.toml .
+
+# 4. Add dependencies
+uv add pandas numpy scikit-learn
+uv add --dev pytest ruff mypy
+
+# 5. Sync and verify
+uv sync
+uv run pytest -q && uv run ruff check . && uv run mypy .
+```
+
+### For Python Projects (Migrate Existing)
+
+```bash
+# Use the migration script
+/path/to/dotfiles/.github/scripts/migrate-to-uv.sh --help
+
+# Quick migration with backup
+/path/to/dotfiles/.github/scripts/migrate-to-uv.sh --keep-old --python 3.13
+
+# Verify after migration
+uv run pytest && uv run ruff check .
 ```
 
 ### Using Copilot Prompts
@@ -80,6 +115,43 @@ fix(scope): resolve bug
 docs: update documentation
 test: add missing tests
 ```
+
+## Usage Guide
+
+### Setting Up VS Code
+
+Sync Copilot instructions to VS Code:
+
+```bash
+cd /path/to/dotfiles/.github
+./scripts/vscode-setup.sh --verbose
+```
+
+This creates symlinks from `.github/copilot/`, `.github/prompts/`, and `.github/chatmodes/` to your VS Code prompts directory.
+
+### Using the pyproject.toml Template
+
+```bash
+# Copy template to new project
+cp /path/to/dotfiles/.github/templates/pyproject.toml /path/to/myproject/
+
+# Edit metadata
+cd /path/to/myproject
+# Update name, version, description, authors, etc.
+
+# Initialize with uv
+uv sync
+```
+
+### Migrating Projects to uv
+
+The migration script supports:
+
+- **conda/mamba** (environment.yml) → uv
+- **pip** (requirements.txt) → uv
+- **Poetry** (pyproject.toml) → uv (with manual adjustments)
+
+See [scripts/README-vscode-setup.md](scripts/README-vscode-setup.md) for detailed usage.
 
 ## Integration
 
@@ -117,9 +189,11 @@ This repository serves three purposes:
 
 See individual READMEs:
 
+- [copilot/](copilot/) - Modular instruction files for Copilot
 - [prompts/README.md](prompts/README.md) - Create new prompts
-- [instructions/](instructions/) - Add new instruction files
-- [copilot-instructions.md](copilot-instructions.md) - Overview document
+- [scripts/README-vscode-setup.md](scripts/README-vscode-setup.md) - Scripts documentation
+- [templates/](templates/) - Project templates (pyproject.toml, etc.)
+- [copilot-instructions.md](copilot-instructions.md) - Main overview document
 
 ## Resources
 
@@ -127,3 +201,5 @@ See individual READMEs:
 - [VS Code Copilot Instructions](https://aka.ms/vscode-instructions-docs)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Python Semantic Release](https://python-semantic-release.readthedocs.io/)
+- [uv Documentation](https://docs.astral.sh/uv/)
+- [PEP 621 - Project Metadata](https://peps.python.org/pep-0621/)
