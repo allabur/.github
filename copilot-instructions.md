@@ -26,7 +26,7 @@ You should analyze the codebase to identify the tech stack. The default stack in
 
 | Tool   | Purpose                          | Version |
 | ------ | -------------------------------- | ------- |
-| Python | Language                         | 3.13+   |
+| Python | Language                         | 3.12+   |
 | pytest | Testing                          | Latest  |
 | ruff   | Linting & Formatting             | Latest  |
 | mypy   | Type Checking                    | Latest  |
