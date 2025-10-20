@@ -6,7 +6,12 @@ on: workflow_dispatch
 jobs:
   # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
   copilot-setup-steps:
+    name: Setup Environment (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
 
     # Set the permissions to the lowest permissions possible needed for your steps.
     # Copilot will be given its own token for its operations.
@@ -20,19 +25,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
         with:
-          environment-file: environment.yml
-          cache-environment: true
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
-      - name: Install package with dev dependencies
-        run: pip install -e ".[dev]"
-        shell: micromamba-shell {0}
+      - name: Install Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Sync environment with dev dependencies
+        run: uv sync --all-extras
 
       - name: Verify setup
         run: |
-          pytest --version
-          ruff --version
-          mypy --version
-        shell: micromamba-shell {0}
+          uv run python --version
+          uv run pytest --version
+          uv run ruff --version
+          uv run mypy --version
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "✅ Setup completed for Python ${{ matrix.python-version }}"
+          echo "📦 Environment ready for Copilot agent"
