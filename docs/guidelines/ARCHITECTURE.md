@@ -50,7 +50,7 @@ my-python-project/
 │       ├── ci.yml         # Main CI workflow
 │       └── release.yml    # Release automation
 ├── pyproject.toml         # Project metadata and dependencies
-├── environment.yml        # Conda environment specification
+├── uv.lock                # Locked dependencies (uv)
 ├── README.md              # Project overview and quick start
 ├── CHANGELOG.md           # Version history
 └── LICENSE                # License information
@@ -71,24 +71,28 @@ my-python-project/
 Python projects commonly follow a layered architecture pattern that separates concerns:
 
 #### Presentation Layer (API/CLI)
+
 - Handles user/system interaction
 - Input validation and serialization
 - Framework-specific code (FastAPI, Flask, Django, Click)
 - Examples: REST endpoints, CLI commands, GraphQL resolvers
 
 #### Business Logic Layer
+
 - Core application logic
 - Domain models and business rules
 - Framework-agnostic code
 - Examples: Service classes, domain models, use cases
 
 #### Data Access Layer
+
 - Database and external service interactions
 - Repository pattern implementation
 - ORM/query abstraction
 - Examples: SQLAlchemy models, repository classes, API clients
 
 #### Infrastructure Layer
+
 - Cross-cutting concerns
 - Configuration management
 - Logging and monitoring
@@ -108,10 +112,10 @@ class UserRepository(Protocol):
 
 class UserService:
     """Business logic for user operations."""
-    
+
     def __init__(self, repository: UserRepository):
         self.repository = repository
-    
+
     def activate_user(self, user_id: int) -> User:
         user = self.repository.get_user(user_id)
         if not user:
@@ -122,6 +126,7 @@ class UserService:
 ```
 
 Benefits:
+
 - Testable code (easy to mock dependencies)
 - Loose coupling between components
 - Clear dependency boundaries
@@ -137,22 +142,22 @@ from typing import Sequence
 
 class BaseRepository(ABC):
     """Abstract base repository."""
-    
+
     @abstractmethod
     def get_by_id(self, id: int) -> Model | None:
         """Retrieve entity by ID."""
         pass
-    
+
     @abstractmethod
     def get_all(self) -> Sequence[Model]:
         """Retrieve all entities."""
         pass
-    
+
     @abstractmethod
     def save(self, entity: Model) -> Model:
         """Save entity."""
         pass
-    
+
     @abstractmethod
     def delete(self, id: int) -> bool:
         """Delete entity by ID."""
@@ -160,23 +165,23 @@ class BaseRepository(ABC):
 
 class SQLAlchemyRepository(BaseRepository):
     """Concrete repository using SQLAlchemy."""
-    
+
     def __init__(self, session: Session, model_class: type[Model]):
         self.session = session
         self.model_class = model_class
-    
+
     def get_by_id(self, id: int) -> Model | None:
         return self.session.get(self.model_class, id)
-    
+
     def get_all(self) -> Sequence[Model]:
         return self.session.query(self.model_class).all()
-    
+
     def save(self, entity: Model) -> Model:
         self.session.add(entity)
         self.session.commit()
         self.session.refresh(entity)
         return entity
-    
+
     def delete(self, id: int) -> bool:
         entity = self.get_by_id(id)
         if entity:
@@ -191,6 +196,7 @@ class SQLAlchemyRepository(BaseRepository):
 Use modern Python data structures for domain models:
 
 #### Dataclasses (Built-in)
+
 For simple data containers with type hints:
 
 ```python
@@ -205,17 +211,18 @@ class User:
     name: str
     is_active: bool = True
     created_at: datetime = field(default_factory=datetime.now)
-    
+
     def activate(self) -> None:
         """Activate user account."""
         self.is_active = True
-    
+
     def deactivate(self) -> None:
         """Deactivate user account."""
         self.is_active = False
 ```
 
 #### Pydantic Models
+
 For validation and serialization (especially in APIs):
 
 ```python
@@ -235,7 +242,7 @@ class UserResponse(BaseModel):
     name: str
     is_active: bool
     created_at: datetime
-    
+
     class Config:
         from_attributes = True  # For SQLAlchemy models
 ```
@@ -266,22 +273,22 @@ class Config:
     # Database
     database_url: str
     database_pool_size: int = 10
-    
+
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_debug: bool = False
-    
+
     # Security
     secret_key: str
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 30
-    
+
     @classmethod
     def from_env(cls) -> "Config":
         """Load configuration from environment variables."""
         load_dotenv()
-        
+
         return cls(
             database_url=os.getenv("DATABASE_URL", "sqlite:///./app.db"),
             database_pool_size=int(os.getenv("DB_POOL_SIZE", "10")),
@@ -292,7 +299,7 @@ class Config:
             jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
             jwt_expire_minutes=int(os.getenv("JWT_EXPIRE_MINUTES", "30")),
         )
-    
+
     def validate(self) -> None:
         """Validate configuration."""
         if not self.secret_key:
@@ -314,19 +321,19 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application settings with automatic environment loading."""
-    
+
     # Database
     database_url: str
     database_pool_size: int = 10
-    
+
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
-    
+
     # Security
     secret_key: str
     jwt_algorithm: str = "HS256"
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -347,16 +354,16 @@ version = "1.0.0"
 description = "My Python project"
 authors = [{name = "Your Name", email = "you@example.com"}]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 keywords = ["python", "example"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 dependencies = [
@@ -438,6 +445,7 @@ fastapi-app/
 ```
 
 **Key features:**
+
 - Separation of API routes, schemas, and business logic
 - FastAPI dependency injection for services
 - Pydantic models for request/response validation
@@ -472,10 +480,12 @@ data-pipeline/
 │   └── test_load/
 ├── notebooks/
 │   └── exploration.ipynb
-└── environment.yml
+├── pyproject.toml
+└── uv.lock
 ```
 
 **Key features:**
+
 - Clear ETL stages (Extract, Transform, Load)
 - Pandas/NumPy for data processing
 - CLI for pipeline execution
@@ -507,6 +517,7 @@ cli-tool/
 ```
 
 **Key features:**
+
 - Click or Typer for CLI framework
 - Pluggable command architecture
 - Rich for beautiful terminal output
@@ -521,7 +532,7 @@ Encapsulates business logic and orchestrates operations:
 ```python
 class UserService:
     """Service for user-related operations."""
-    
+
     def __init__(
         self,
         user_repo: UserRepository,
@@ -531,7 +542,7 @@ class UserService:
         self.user_repo = user_repo
         self.email_service = email_service
         self.logger = logger
-    
+
     def register_user(
         self,
         email: str,
@@ -542,7 +553,7 @@ class UserService:
         # Validation
         if self.user_repo.get_by_email(email):
             raise ValueError(f"User with email {email} already exists")
-        
+
         # Create user
         user = User(
             email=email,
@@ -550,17 +561,17 @@ class UserService:
             name=name,
             is_active=False,
         )
-        
+
         # Save to database
         user = self.user_repo.save(user)
-        
+
         # Send verification email
         try:
             self.email_service.send_verification(user)
         except EmailError as e:
             self.logger.error(f"Failed to send verification email: {e}")
             # Don't fail registration if email fails
-        
+
         return user
 ```
 
@@ -587,12 +598,12 @@ class JSONExtractor:
 
 class ExtractorFactory:
     """Factory for creating extractors based on file type."""
-    
+
     _extractors: dict[str, type[DataExtractor]] = {
         "csv": CSVExtractor,
         "json": JSONExtractor,
     }
-    
+
     @classmethod
     def create(cls, file_type: str) -> DataExtractor:
         """Create extractor for given file type."""
@@ -615,30 +626,30 @@ from abc import ABC, abstractmethod
 
 class ValidationStrategy(ABC):
     """Abstract validation strategy."""
-    
+
     @abstractmethod
     def validate(self, data: dict[str, any]) -> bool:
         pass
 
 class StrictValidation(ValidationStrategy):
     """Strict validation with all fields required."""
-    
+
     def validate(self, data: dict[str, any]) -> bool:
         required_fields = ["name", "email", "age"]
         return all(field in data for field in required_fields)
 
 class LenientValidation(ValidationStrategy):
     """Lenient validation with optional fields."""
-    
+
     def validate(self, data: dict[str, any]) -> bool:
         return "email" in data
 
 class DataProcessor:
     """Process data with configurable validation."""
-    
+
     def __init__(self, validation_strategy: ValidationStrategy):
         self.validation_strategy = validation_strategy
-    
+
     def process(self, data: dict[str, any]) -> dict[str, any]:
         if not self.validation_strategy.validate(data):
             raise ValueError("Validation failed")
@@ -721,14 +732,14 @@ def test_user_registration_sends_email(user_repository):
     # Arrange
     email_service = Mock()
     user_service = UserService(user_repository, email_service)
-    
+
     # Act
     user = user_service.register_user(
         email="new@example.com",
         password="password123",
         name="New User"
     )
-    
+
     # Assert
     assert user.email == "new@example.com"
     email_service.send_verification.assert_called_once_with(user)
