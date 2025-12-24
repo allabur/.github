@@ -18,6 +18,11 @@ body:
         1. Run `chum stats --window 7`
         2. Observe ValueError on empty input
   - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Python, packages (paste `pip freeze` snippet if relevant)
+  - type: textarea
     id: expected
     attributes:
       label: Expected
@@ -25,6 +30,12 @@ body:
     id: actual
     attributes:
       label: Actual
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
   - type: dropdown
     id: severity
     attributes:
@@ -37,17 +48,15 @@ body:
     validations:
       required: false
   - type: textarea
-    id: env
-    attributes:
-      label: Environment
-      description: OS, Python, packages (paste `pip freeze` snippet if relevant)
-  - type: textarea
-    id: logs
-    attributes:
-      label: Logs/traceback
-      render: shell
-  - type: textarea
     id: constraints
     attributes:
       label: Constraints / suspected area
       description: Performance, data size, concurrency, security, or module(s) implicated.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
